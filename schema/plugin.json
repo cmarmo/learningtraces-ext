@@ -1,0 +1,16 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "title": "learning-traces-extension",
+  "description": "learning-traces-extension settings.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false,
+  "jupyter.lab.toolbars": {
+    "Cell": [
+      {
+        "name": "run-code-cell",
+        "command": "toolbar-button:run-code-cell"
+      }
+    ]
+  }
+}
