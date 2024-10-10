@@ -1,3 +1,5 @@
+import { writeFile } from 'node:fs/promises';
+
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
@@ -35,6 +37,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         const myCellModel =  tracker.activeCell?.model as CodeCellModel;
         const learnedCell = myCellModel.outputs;
         console.log(learnedCell.toJSON()[0]);
+        writeFile("./learningtrace.json", JSON.stringify(learnedCell.toJSON(), null, 2));
         console.log(`Executed ${commandID}`);
         toggled = !toggled;
       }
