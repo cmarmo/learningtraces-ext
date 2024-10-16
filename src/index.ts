@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises';
+//import { writeFile } from 'node:fs/promises';
 
 import {
   JupyterFrontEnd,
@@ -7,6 +7,15 @@ import {
 import { INotebookTracker } from '@jupyterlab/notebook';
 import { runIcon } from '@jupyterlab/ui-components';
 import { CodeCellModel } from '@jupyterlab/cells'
+
+async function writelt(content: String) {
+  try {
+    //await writeFile('./learningtrace.json', content);
+    console.log(content);
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 const CommandIds = {
   /**
@@ -37,7 +46,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         const myCellModel =  tracker.activeCell?.model as CodeCellModel;
         const learnedCell = myCellModel.outputs;
         console.log(learnedCell.toJSON()[0]);
-        writeFile("./learningtrace.json", JSON.stringify(learnedCell.toJSON(), null, 2));
+        writelt(JSON.stringify(learnedCell.toJSON()));
         console.log(`Executed ${commandID}`);
         toggled = !toggled;
       }
