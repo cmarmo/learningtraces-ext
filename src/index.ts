@@ -4,7 +4,7 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { INotebookTracker } from '@jupyterlab/notebook';
+import { INotebookTracker, NotebookActions } from '@jupyterlab/notebook';
 import { runIcon } from '@jupyterlab/ui-components';
 import { CodeCellModel } from '@jupyterlab/cells'
 
@@ -21,7 +21,7 @@ const CommandIds = {
   /**
    * Command to run a code cell.
    */
-  runCodeCell: 'toolbar-button:run-code-cell'
+  runCodeCell: 'notebook:save-trace'
 };
 
 /**
@@ -43,12 +43,19 @@ const plugin: JupyterFrontEndPlugin<void> = {
       isToggled: () => toggled,
       iconClass: 'some-css-icon-class',
       execute: () => {
-        const myCellModel =  tracker.activeCell?.model as CodeCellModel;
-        const learnedCell = myCellModel.outputs;
-        console.log(learnedCell.toJSON()[0]);
-        writelt(JSON.stringify(learnedCell.toJSON()));
-        console.log(`Executed ${commandID}`);
-        toggled = !toggled;
+        commands.execute('notebook:run-cell');
+        NotebookActions.executed.connect((_, args) => {
+          const { cell, notebook, success } = args;
+          if (tracker.activeCell == cell) {
+            const myCellModel =  tracker.activeCell.model as CodeCellModel;
+            const learnedCell = myCellModel.outputs;
+            writelt(JSON.stringify(learnedCell.toJSON()));
+            console.log(`Executed ${commandID}`);
+            console.log(notebook);
+            console.log(success);
+            toggled = !toggled;
+          }
+        })
       }
     });
 
@@ -59,7 +66,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
       icon: runIcon,
       caption: 'Run a code cell',
       execute: () => {
-        commands.execute('notebook:run-cell');
         commands.execute('save-trace');
       },
       isVisible: () => tracker.activeCell?.model.type === 'code'
