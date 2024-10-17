@@ -4,7 +4,14 @@
   "title": "learning-traces-extension",
   "description": "learning-traces-extension settings.",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "learningtag": {
+      "type": "string",
+      "title": "learningtag",
+      "description": "This is the tag used in cell metadata to identify learning cells.",
+      "default": ""
+    }
+  },
   "additionalProperties": false,
   "jupyter.lab.toolbars": {}
 }
