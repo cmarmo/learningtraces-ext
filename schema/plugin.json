@@ -1,25 +1,10 @@
 {
   "jupyter.lab.shortcuts":
-    [
-      {
-        "command": "notebook:save-trace",
-        "keys": [
-            "Shift Enter"
-        ],
-        "selector": "[data-jp-code-save-trace]"
-    }
-    ],
+    [],
   "title": "learning-traces-extension",
   "description": "learning-traces-extension settings.",
   "type": "object",
   "properties": {},
   "additionalProperties": false,
-  "jupyter.lab.toolbars": {
-    "Cell": [
-      {
-        "name": "save-trace",
-        "command": "notebook:save-trace"
-      }
-    ]
-  }
+  "jupyter.lab.toolbars": {}
 }

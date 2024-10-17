@@ -5,7 +5,6 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { INotebookTracker, NotebookActions } from '@jupyterlab/notebook';
-import { runIcon } from '@jupyterlab/ui-components';
 import { CodeCellModel } from '@jupyterlab/cells'
 
 async function writelt(content: String) {
@@ -17,15 +16,8 @@ async function writelt(content: String) {
   }
 }
 
-const CommandIds = {
-  /**
-   * Command to run a code cell.
-   */
-  runCodeCell: 'notebook:save-trace'
-};
-
 /**
- * Initialization data for the @jupyterlab-examples/cell-toolbar extension.
+ * Initialization data for the jupyterlab learning traces extension.
  */
 const plugin: JupyterFrontEndPlugin<void> = {
   id: 'learning-traces-extension:plugin',
@@ -33,42 +25,15 @@ const plugin: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [INotebookTracker],
   activate: (app: JupyterFrontEnd, tracker: INotebookTracker) => {
-    const commandID = 'save-trace';
-    let toggled = false;
-    
-    app.commands.addCommand(commandID, {
-      label: 'Save the learning trace.',
-      isEnabled: () => true,
-      isVisible: () => true,
-      isToggled: () => toggled,
-      iconClass: 'some-css-icon-class',
-      execute: () => {
-        commands.execute('notebook:run-cell');
-        NotebookActions.executed.connect((_, args) => {
-          const { cell, notebook, success } = args;
-          if (tracker.activeCell == cell) {
-            const myCellModel =  tracker.activeCell.model as CodeCellModel;
-            const learnedCell = myCellModel.outputs;
-            writelt(JSON.stringify(learnedCell.toJSON()));
-            console.log(`Executed ${commandID}`);
-            console.log(notebook);
-            console.log(success);
-            toggled = !toggled;
-          }
-        })
+    NotebookActions.executed.connect((_, args) => {
+      const { cell, notebook, success } = args;
+      if (cell.model.type === 'code') {
+        const myCellModel = cell.model as CodeCellModel;
+        const learnedCell = myCellModel.outputs;
+        writelt(JSON.stringify(learnedCell.toJSON()));
+        console.log(notebook);
+        console.log(success);
       }
-    });
-
-    const { commands } = app;
-
-    /* Adds a command enabled only on code cell */
-    commands.addCommand(CommandIds.runCodeCell, {
-      icon: runIcon,
-      caption: 'Run a code cell',
-      execute: () => {
-        commands.execute('save-trace');
-      },
-      isVisible: () => tracker.activeCell?.model.type === 'code'
     });
   }
 };
