@@ -29,10 +29,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
       const { cell, notebook, success } = args;
       if (cell.model.type === 'code') {
         const myCellModel = cell.model as CodeCellModel;
-        const learnedCell = myCellModel.outputs;
-        writelt(JSON.stringify(learnedCell.toJSON()));
+        const learnedCell = myCellModel.outputs.toJSON();
+        let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell)) 
+        jsonCellOutput.push({"success": success});
+        writelt(JSON.stringify(jsonCellOutput));
         console.log(notebook);
-        console.log(success);
       }
     });
   }
