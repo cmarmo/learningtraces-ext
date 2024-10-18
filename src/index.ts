@@ -10,7 +10,7 @@ import { CodeCellModel } from '@jupyterlab/cells'
 
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 
-async function writelt(content: String) {
+async function writelt(content: string) {
   try {
     //await writeFile('./learningtrace.json', content);
     console.log(content);
@@ -67,12 +67,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
     NotebookActions.executed.connect((_, args) => {
       const { cell, notebook, success } = args;
       if (cell.model.type === 'code') {
-        const myCellModel = cell.model as CodeCellModel;
-        const learnedCell = myCellModel.outputs.toJSON();
-        let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell)) 
-        jsonCellOutput.push({"success": success});
-        writelt(JSON.stringify(jsonCellOutput));
-        console.log(notebook);
+        if (
+          learningtag === "" ||
+          (learningtag !== "" && cell.model.getMetadata(learningtag))
+        ) {
+          const myCellModel = cell.model as CodeCellModel;
+          const learnedCell = myCellModel.outputs.toJSON();
+          let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell))
+          jsonCellOutput.push({"success": success});
+          writelt(JSON.stringify(jsonCellOutput, undefined, 4));
+          console.log(notebook);
+        }
       }
     });
   }
