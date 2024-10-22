@@ -1,5 +1,3 @@
-//import { writeFile } from 'node:fs/promises';
-
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
@@ -12,16 +10,42 @@ const PLUGIN_ID = 'learning-traces-extension:plugin';
 const LEARNING_TRACE_FILE = '.learningtrace.json';
 
 const root = await navigator.storage.getDirectory();
-// Create a new file handle
-const fileHandle = await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
+// Create a new file
+await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
 
-async function writelt(filehandle: FileSystemFileHandle, content: string) {
+async function writelt(content: string) {
   try {
-    //await writeFile('./learningtrace.json', content);
-    const writable = await filehandle.createWritable();
-    await writable.write(content);
-    await writable.close();
-    console.log(content);
+    const filehandle = await root.getFileHandle(LEARNING_TRACE_FILE);
+    const writableopfs = await filehandle.createWritable({ keepExistingData: true });
+    await writableopfs.write(content);
+    await writableopfs.close();
+    const file = await filehandle.getFile();
+    console.log(await file.text());
+    // Obtain a file handle to a new file in the user-visible file system
+    // with the same name as the file in the origin private file system.
+    // This is not supported yet in Firefox
+    /*const saveHandle = await showSaveFilePicker({
+      suggestedName: filehandle.name || ''
+    });
+    const writable = await saveHandle.createWritable();
+    await writable.write(await filehandle.getFile());
+    await writable.close();*/
+
+    // Create the blob URL.
+    const blobURL = URL.createObjectURL(file);
+    // Create the `<a download>` element and append it invisibly.
+    const a = document.createElement('a');
+    a.href = blobURL;
+    a.download = filehandle.name;
+    a.style.display = 'none';
+    document.body.append(a);
+    // Programmatically click the element.
+    a.click();
+    // Revoke the blob URL and remove the element.
+    setTimeout(() => {
+      URL.revokeObjectURL(blobURL);
+      a.remove();
+    }, 1000);
   } catch (err) {
     console.log(err);
   }
@@ -83,7 +107,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           const learnedCell = myCellModel.outputs.toJSON();
           let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell))
           jsonCellOutput.push({"success": success});
-          writelt(fileHandle, JSON.stringify(jsonCellOutput, undefined, 4));
+          writelt(JSON.stringify(jsonCellOutput, undefined, 4));
           console.log(notebook);
         }
       }
