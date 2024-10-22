@@ -9,10 +9,18 @@ import { NotebookActions } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells'
 
 const PLUGIN_ID = 'learning-traces-extension:plugin';
+const LEARNING_TRACE_FILE = '.learningtrace.json';
 
-async function writelt(content: string) {
+const root = await navigator.storage.getDirectory();
+// Create a new file handle
+const fileHandle = await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
+
+async function writelt(filehandle: FileSystemFileHandle, content: string) {
   try {
     //await writeFile('./learningtrace.json', content);
+    const writable = await filehandle.createWritable();
+    await writable.write(content);
+    await writable.close();
     console.log(content);
   } catch (err) {
     console.log(err);
@@ -75,7 +83,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           const learnedCell = myCellModel.outputs.toJSON();
           let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell))
           jsonCellOutput.push({"success": success});
-          writelt(JSON.stringify(jsonCellOutput, undefined, 4));
+          writelt(fileHandle, JSON.stringify(jsonCellOutput, undefined, 4));
           console.log(notebook);
         }
       }
