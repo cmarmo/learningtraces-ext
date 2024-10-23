@@ -5,7 +5,6 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { NotebookActions } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells'
-
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const LEARNING_TRACE_FILE = '.learningtrace.json';
 
@@ -21,6 +20,33 @@ async function writelt(content: string) {
     await writableopfs.close();
     const file = await filehandle.getFile();
     console.log(await file.text());
+    // POST the file using Jupyter Server API
+    //const serverUrl = location.protocol + "//" + location.host + "/api/contents/";
+    const serverUrl = location.protocol + "//" + location.host + "/api/me";
+    const response = await fetch(serverUrl, {
+      //method: 'PUT',
+      method: 'GET',
+      /*body: JSON.stringify(
+        {'name': LEARNING_TRACE_FILE,
+         'path' :( '' + LEARNING_TRACE_FILE),
+         'format': 'json',
+         'type': 'file',
+         'content': await file.text()
+        })*/
+      //headers: {'Content-Type': 'application/json', 'Authorization': 'key='+API_KEY} 
+    });
+    
+    if (!response.ok) 
+    { 
+        console.error("Error");
+    }
+    else if (response.status >= 400) {
+        console.error('HTTP Error: '+response.status+' - '+response.statusText);
+    }
+    else{
+        //onSuccess();
+        console.log(response.body);
+    }
     // Obtain a file handle to a new file in the user-visible file system
     // with the same name as the file in the origin private file system.
     // This is not supported yet in Firefox
@@ -32,20 +58,20 @@ async function writelt(content: string) {
     await writable.close();*/
 
     // Create the blob URL.
-    const blobURL = URL.createObjectURL(file);
+    //const blobURL = URL.createObjectURL(file);
     // Create the `<a download>` element and append it invisibly.
-    const a = document.createElement('a');
-    a.href = blobURL;
-    a.download = filehandle.name;
-    a.style.display = 'none';
-    document.body.append(a);
+    //const a = document.createElement('a');
+    //a.href = blobURL;
+    //a.download = filehandle.name;
+    //a.style.display = 'none';
+    //document.body.append(a);
     // Programmatically click the element.
-    a.click();
+    //a.click();
     // Revoke the blob URL and remove the element.
-    setTimeout(() => {
-      URL.revokeObjectURL(blobURL);
-      a.remove();
-    }, 1000);
+    //setTimeout(() => {
+    //  URL.revokeObjectURL(blobURL);
+    //  a.remove();
+    //}, 1000);
   } catch (err) {
     console.log(err);
   }
