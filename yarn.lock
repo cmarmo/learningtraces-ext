@@ -7291,6 +7291,7 @@ __metadata:
     "@jupyterlab/application": ^4.2.5
     "@jupyterlab/builder": ^4.0.0
     "@jupyterlab/notebook": ^4.2.5
+    "@jupyterlab/services": ^7.2.5
     "@jupyterlab/settingregistry": ^4.2.5
     "@jupyterlab/testutils": ^4.0.0
     "@jupyterlab/ui-components": ^4.2.5

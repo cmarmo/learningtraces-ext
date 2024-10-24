@@ -1,3 +1,4 @@
+import { ContentsManager } from '@jupyterlab/services';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
@@ -6,34 +7,46 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { NotebookActions } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells'
 const PLUGIN_ID = 'learning-traces-extension:plugin';
-const LEARNING_TRACE_FILE = '.learningtrace.json';
+const d = new Date();
+const LEARNING_TRACE_FILE = '.learningtrace_' + d.getTime().toString() + '.json';
 
-const root = await navigator.storage.getDirectory();
+//const root = await navigator.storage.getDirectory();
 // Create a new file
-await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
+//await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
+const contents = new ContentsManager();
+const model = await contents.newUntitled({
+  path: '/',
+  type: 'file',
+  ext: 'json'
+});
+await contents.rename(model.path, '/'+LEARNING_TRACE_FILE);
 
 async function writelt(content: string) {
   try {
-    const filehandle = await root.getFileHandle(LEARNING_TRACE_FILE);
-    const writableopfs = await filehandle.createWritable({ keepExistingData: true });
-    await writableopfs.write(content);
-    await writableopfs.close();
-    const file = await filehandle.getFile();
-    console.log(await file.text());
+    console.log(await contents.get(model.path));
+    //const filehandle = await root.getFileHandle(LEARNING_TRACE_FILE);
+    //const file = await filehandle.getFile();
+    //const position = file.size;
+    //const writableopfs = await filehandle.createWritable({ keepExistingData: true });
+    //await writableopfs.seek(position);
+    //await writableopfs.write(content);
+    //await writableopfs.close();
+    //const file = await filehandle.getFile();
+    //console.log(await file.text());
     // POST the file using Jupyter Server API
-    //const serverUrl = location.protocol + "//" + location.host + "/api/contents/";
-    const serverUrl = location.protocol + "//" + location.host + "/api/me";
-    const response = await fetch(serverUrl, {
-      //method: 'PUT',
-      method: 'GET',
-      /*body: JSON.stringify(
+    //const serverUrl = location.protocol + "//" + location.host + "/api/contents/" + LEARNING_TRACE_FILE;
+    //const serverUrl = location.protocol + "//" + location.host + "/api/me";
+    /*const response = await fetch(serverUrl, {
+      method: 'PUT',
+      //method: 'GET',
+      body: JSON.stringify(
         {'name': LEARNING_TRACE_FILE,
          'path' :( '' + LEARNING_TRACE_FILE),
-         'format': 'json',
+         'format': 'text',
          'type': 'file',
          'content': await file.text()
-        })*/
-      //headers: {'Content-Type': 'application/json', 'Authorization': 'key='+API_KEY} 
+        }),
+      headers: {'Content-Type': 'application/json', 'Authorization': 'token 6bcad4b73485be5a961733ced03b5d851eff937508677249'} 
     });
     
     if (!response.ok) 
@@ -42,11 +55,11 @@ async function writelt(content: string) {
     }
     else if (response.status >= 400) {
         console.error('HTTP Error: '+response.status+' - '+response.statusText);
-    }
-    else{
+    }*/
+    //else{
         //onSuccess();
-        console.log(response.body);
-    }
+    //    console.log(response.body);
+    //}
     // Obtain a file handle to a new file in the user-visible file system
     // with the same name as the file in the origin private file system.
     // This is not supported yet in Firefox
