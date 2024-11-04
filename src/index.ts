@@ -8,83 +8,30 @@ import { NotebookActions } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells'
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
-const LEARNING_TRACE_FILE = '.learningtrace_' + d.getTime().toString() + '.json';
+const LEARNING_TRACE_FILE = 'learningtrace_' + d.getTime().toString() + '.json';
+//console.log(LEARNING_TRACE_FILE);
 
 //const root = await navigator.storage.getDirectory();
 // Create a new file
 //await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
 const contents = new ContentsManager();
 const model = await contents.newUntitled({
-  path: '/',
+  path: '',
   type: 'file',
   ext: 'json'
 });
-await contents.rename(model.path, '/'+LEARNING_TRACE_FILE);
+contents.rename(model.path, '/' + LEARNING_TRACE_FILE);
 
 async function writelt(content: string) {
   try {
-    console.log(await contents.get(model.path));
-    //const filehandle = await root.getFileHandle(LEARNING_TRACE_FILE);
-    //const file = await filehandle.getFile();
-    //const position = file.size;
-    //const writableopfs = await filehandle.createWritable({ keepExistingData: true });
-    //await writableopfs.seek(position);
-    //await writableopfs.write(content);
-    //await writableopfs.close();
-    //const file = await filehandle.getFile();
-    //console.log(await file.text());
-    // POST the file using Jupyter Server API
-    //const serverUrl = location.protocol + "//" + location.host + "/api/contents/" + LEARNING_TRACE_FILE;
-    //const serverUrl = location.protocol + "//" + location.host + "/api/me";
-    /*const response = await fetch(serverUrl, {
-      method: 'PUT',
-      //method: 'GET',
-      body: JSON.stringify(
-        {'name': LEARNING_TRACE_FILE,
-         'path' :( '' + LEARNING_TRACE_FILE),
-         'format': 'text',
-         'type': 'file',
-         'content': await file.text()
-        }),
-      headers: {'Content-Type': 'application/json', 'Authorization': 'token 6bcad4b73485be5a961733ced03b5d851eff937508677249'} 
+    const learningContent = JSON.stringify(
+      await contents.get(LEARNING_TRACE_FILE)
+    ).concat(content);
+    contents.save(LEARNING_TRACE_FILE, {
+      content: learningContent,
+      format: 'text',
+      type: 'file'
     });
-    
-    if (!response.ok) 
-    { 
-        console.error("Error");
-    }
-    else if (response.status >= 400) {
-        console.error('HTTP Error: '+response.status+' - '+response.statusText);
-    }*/
-    //else{
-        //onSuccess();
-    //    console.log(response.body);
-    //}
-    // Obtain a file handle to a new file in the user-visible file system
-    // with the same name as the file in the origin private file system.
-    // This is not supported yet in Firefox
-    /*const saveHandle = await showSaveFilePicker({
-      suggestedName: filehandle.name || ''
-    });
-    const writable = await saveHandle.createWritable();
-    await writable.write(await filehandle.getFile());
-    await writable.close();*/
-
-    // Create the blob URL.
-    //const blobURL = URL.createObjectURL(file);
-    // Create the `<a download>` element and append it invisibly.
-    //const a = document.createElement('a');
-    //a.href = blobURL;
-    //a.download = filehandle.name;
-    //a.style.display = 'none';
-    //document.body.append(a);
-    // Programmatically click the element.
-    //a.click();
-    // Revoke the blob URL and remove the element.
-    //setTimeout(() => {
-    //  URL.revokeObjectURL(blobURL);
-    //  a.remove();
-    //}, 1000);
   } catch (err) {
     console.log(err);
   }
@@ -145,9 +92,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
           const myCellModel = cell.model as CodeCellModel;
           const learnedCell = myCellModel.outputs.toJSON();
           let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell))
-          jsonCellOutput.push({"success": success});
+          jsonCellOutput.push({
+            "success": success,
+            "notebook": notebook.node.baseURI
+          });
           writelt(JSON.stringify(jsonCellOutput, undefined, 4));
-          console.log(notebook);
         }
       }
     });
