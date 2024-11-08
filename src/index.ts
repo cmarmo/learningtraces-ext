@@ -8,25 +8,20 @@ import { NotebookActions } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells'
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
-const LEARNING_TRACE_FILE = 'learningtrace_' + d.getTime().toString() + '.json';
-//console.log(LEARNING_TRACE_FILE);
+const LEARNING_TRACE_FILE = 'learningtrace_' + d.getTime().toString() + '.jsonl';
 
-//const root = await navigator.storage.getDirectory();
-// Create a new file
-//await root.getFileHandle(LEARNING_TRACE_FILE, { create: true });
 const contents = new ContentsManager();
+let learningContent = '';
 const model = await contents.newUntitled({
   path: '',
   type: 'file',
-  ext: 'json'
+  ext: 'jsonl'
 });
-contents.rename(model.path, '/' + LEARNING_TRACE_FILE);
+contents.rename(model.path, LEARNING_TRACE_FILE);
 
 async function writelt(content: string) {
   try {
-    const learningContent = JSON.stringify(
-      await contents.get(LEARNING_TRACE_FILE)
-    ).concat(content);
+    learningContent += content;
     contents.save(LEARNING_TRACE_FILE, {
       content: learningContent,
       format: 'text',
@@ -91,11 +86,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
         ) {
           const myCellModel = cell.model as CodeCellModel;
           const learnedCell = myCellModel.outputs.toJSON();
-          let jsonCellOutput = JSON.parse(JSON.stringify(learnedCell))
-          jsonCellOutput.push({
-            "success": success,
-            "notebook": notebook.node.baseURI
-          });
+          const jsonStringOutput = '{ "outputs" : ' +
+            JSON.stringify(learnedCell) + ', "success" : ' + success +
+            ', "notebook" : "' + notebook.node.baseURI + '" }';
+          let jsonCellOutput = JSON.parse(jsonStringOutput)
           writelt(JSON.stringify(jsonCellOutput, undefined, 4));
         }
       }
