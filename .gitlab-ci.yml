@@ -19,6 +19,8 @@ build:
     - python -m pip install .[test]
     - jupyter labextension list
     - jupyter labextension list 2>&1 | grep -ie "learning-traces-extension.*OK"
+    # instal dependencies for browser check
+    - npx playwright install-deps
     - python -m jupyterlab.browser_check --allow-root
 
 # test:
