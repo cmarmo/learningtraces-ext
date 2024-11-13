@@ -19,7 +19,7 @@ build:
     - python -m pip install .[test]
     - jupyter labextension list
     - jupyter labextension list 2>&1 | grep -ie "learning-traces-extension.*OK"
-    - python -m jupyterlab.browser_check
+    - python -m jupyterlab.browser_check --allow-root
 
 # test:
 #   stage: test
