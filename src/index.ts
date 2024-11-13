@@ -93,7 +93,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
             ', "notebook" : "' +
             notebook.node.baseURI +
             '" }';
-          let jsonCellOutput = JSON.parse(jsonStringOutput);
+          const jsonCellOutput = JSON.parse(jsonStringOutput);
           writelt(JSON.stringify(jsonCellOutput, undefined, 4));
         }
       }
