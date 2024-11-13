@@ -8,7 +8,7 @@ lint:
   before_script:
     # install dependencies
     - apt update
-    - apt install nodejs npm
+    - apt install -y nodejs npm
     - python -m pip install -U "jupyterlab>=4.0.0,<5"
   script:
     - set -eux
