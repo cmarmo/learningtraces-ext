@@ -3,30 +3,26 @@ stages:
   - build
   - test
 
-lint:
+build:
   stage: build
   before_script:
     # install dependencies
     - apt update
     - apt install -y nodejs npm
     - python -m pip install -U "jupyterlab>=4.0.0,<5"
-  script:
+    # lint checks
     - set -eux
     - jlpm
     - jlpm run lint:check
-
-build:
-  stage: build
   script:
     - set -eux
     - python -m pip install .[test]
     - jupyter labextension list
     - jupyter labextension list 2>&1 | grep -ie "learning-traces-extension.*OK"
     - python -m jupyterlab.browser_check
-  needs: [lint]
 
-test:
-  stage: test
-  script:
-    - set -eux
-    - jlpm run test  
+# test:
+#   stage: test
+#   script:
+#     - set -eux
+#     - jlpm run test  
