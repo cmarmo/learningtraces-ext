@@ -12,6 +12,5 @@
     }
   },
   "additionalProperties": false,
-  "jupyter.lab.toolbars": {},
-  "ContentsManager.allow_hidden": true
+  "jupyter.lab.toolbars": {}
 }
