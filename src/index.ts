@@ -5,10 +5,11 @@ import {
 } from '@jupyterlab/application';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { NotebookActions } from '@jupyterlab/notebook';
-import { CodeCellModel } from '@jupyterlab/cells'
+import { CodeCellModel } from '@jupyterlab/cells';
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
-const LEARNING_TRACE_FILE = 'learningtrace_' + d.getTime().toString() + '.jsonl';
+const LEARNING_TRACE_FILE =
+  '.learningtrace_' + d.getTime().toString() + '.jsonl';
 
 const contents = new ContentsManager();
 let learningContent = '';
@@ -37,16 +38,14 @@ async function writelt(content: string) {
  */
 const plugin: JupyterFrontEndPlugin<void> = {
   id: PLUGIN_ID,
-  description: 'A jupyter extension that save learning traces when executing a notebook.',
+  description:
+    'A jupyter extension that save learning traces when executing a notebook.',
   autoStart: true,
-  requires: [ ISettingRegistry],
-  activate: (
-    app: JupyterFrontEnd,
-    settings: ISettingRegistry
-  ) => {
+  requires: [ISettingRegistry],
+  activate: (app: JupyterFrontEnd, settings: ISettingRegistry) => {
     console.log('JupyterLab extension learning_traces_extension is activated!');
 
-    let learningtag = "";
+    let learningtag = '';
 
     /**
      * Load the settings for this extension
@@ -81,15 +80,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
       const { cell, notebook, success } = args;
       if (cell.model.type === 'code') {
         if (
-          learningtag === "" ||
-          (learningtag !== "" && cell.model.getMetadata(learningtag))
+          learningtag === '' ||
+          (learningtag !== '' && cell.model.getMetadata(learningtag))
         ) {
           const myCellModel = cell.model as CodeCellModel;
           const learnedCell = myCellModel.outputs.toJSON();
-          const jsonStringOutput = '{ "outputs" : ' +
-            JSON.stringify(learnedCell) + ', "success" : ' + success +
-            ', "notebook" : "' + notebook.node.baseURI + '" }';
-          let jsonCellOutput = JSON.parse(jsonStringOutput)
+          const jsonStringOutput =
+            '{ "outputs" : ' +
+            JSON.stringify(learnedCell) +
+            ', "success" : ' +
+            success +
+            ', "notebook" : "' +
+            notebook.node.baseURI +
+            '" }';
+          let jsonCellOutput = JSON.parse(jsonStringOutput);
           writelt(JSON.stringify(jsonCellOutput, undefined, 4));
         }
       }

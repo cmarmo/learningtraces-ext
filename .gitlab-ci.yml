@@ -1,0 +1,30 @@
+image: node:lts-alpine
+stages:
+  - build
+  - test
+
+lint:
+  stage: build
+  before_script:
+    # install dependencies
+    - python -m pip install -U "jupyterlab>=4.0.0,<5"
+  script:
+    - set -eux
+    - jlpm
+    - jlpm run lint:check
+
+build:
+  stage: build
+  script:
+    - set -eux
+    - python -m pip install .[test]
+    - jupyter labextension list
+    - jupyter labextension list 2>&1 | grep -ie "learning-traces-extension.*OK"
+    - python -m jupyterlab.browser_check
+  needs: lint
+
+test:
+  stage: test
+  script:
+    - set -eux
+    - jlpm run test  

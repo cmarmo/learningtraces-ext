@@ -1,6 +1,5 @@
 {
-  "jupyter.lab.shortcuts":
-    [],
+  "jupyter.lab.shortcuts": [],
   "title": "learning-traces-extension",
   "description": "learning-traces-extension settings.",
   "type": "object",
