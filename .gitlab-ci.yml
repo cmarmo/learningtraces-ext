@@ -21,7 +21,7 @@ build:
     - jupyter labextension list
     - jupyter labextension list 2>&1 | grep -ie "learning-traces-extension.*OK"
     - python -m jupyterlab.browser_check
-  needs: lint
+  needs: [lint]
 
 test:
   stage: test
