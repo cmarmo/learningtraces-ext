@@ -11,20 +11,14 @@ const d = new Date();
 const LEARNING_TRACE_FILE =
   '.learningtrace_' + d.getTime().toString() + '.jsonl';
 
-const contents = new ContentsManager();
-let learningContent = '';
-const model = await contents.newUntitled({
-  path: '',
-  type: 'file',
-  ext: 'jsonl'
-});
-contents.rename(model.path, LEARNING_TRACE_FILE);
-
-async function writelt(content: string) {
+async function writelt(
+  contentsManager: ContentsManager,
+  filename: string,
+  content: string
+) {
   try {
-    learningContent += content;
-    contents.save(LEARNING_TRACE_FILE, {
-      content: learningContent,
+    contentsManager.save(filename, {
+      content: content,
       format: 'text',
       type: 'file'
     });
@@ -42,10 +36,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
     'A jupyter extension that save learning traces when executing a notebook.',
   autoStart: true,
   requires: [ISettingRegistry],
-  activate: (app: JupyterFrontEnd, settings: ISettingRegistry) => {
+  activate: async (app: JupyterFrontEnd, settings: ISettingRegistry) => {
     console.log('JupyterLab extension learning_traces_extension is activated!');
 
     let learningtag = '';
+    let learningpath = '';
 
     /**
      * Load the settings for this extension
@@ -57,6 +52,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
       learningtag = setting.get('learningtag').composite as string;
       console.log(
         `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
+      );
+      learningpath = setting.get('learningpath').composite as string;
+      console.log(
+        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
       );
     }
 
@@ -76,6 +75,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
         );
       });
 
+    const contents = new ContentsManager();
+    let learningContent = '';
+
     NotebookActions.executed.connect((_, args) => {
       const { cell, notebook, success } = args;
       if (cell.model.type === 'code') {
@@ -94,7 +96,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
             notebook.node.baseURI +
             '" }';
           const jsonCellOutput = JSON.parse(jsonStringOutput);
-          writelt(JSON.stringify(jsonCellOutput, undefined, 4));
+          learningContent += JSON.stringify(jsonCellOutput, undefined, 4);
+          const filename = learningpath + '/' + LEARNING_TRACE_FILE;
+          writelt(contents, filename, learningContent);
         }
       }
     });

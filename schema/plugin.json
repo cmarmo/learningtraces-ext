@@ -9,6 +9,12 @@
       "title": "learningtag",
       "description": "This is the tag used in cell metadata to identify learning cells.",
       "default": ""
+    },
+    "learningpath": {
+      "type": "string",
+      "title": "learningpath",
+      "description": "This is the path of the learning traces.",
+      "default": "/"
     }
   },
   "additionalProperties": false,
