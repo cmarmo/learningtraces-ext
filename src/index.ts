@@ -39,8 +39,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
   activate: async (app: JupyterFrontEnd, settings: ISettingRegistry) => {
     console.log('JupyterLab extension learning_traces_extension is activated!');
 
-    let learningtag = '';
-    let learningpath = '';
+    let learningtag : (string | string[]) = '';
+    let learningpath : string = '';
+    let nestedKeys = false;
 
     /**
      * Load the settings for this extension
@@ -50,6 +51,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
     function loadSetting(setting: ISettingRegistry.ISettings): void {
       // Read the settings and convert to the correct type
       learningtag = setting.get('learningtag').composite as string;
+      let tags : string[] = [];
+      if (learningtag !== '') {
+        tags = learningtag.split('.');
+        if (tags.length > 1) {
+          nestedKeys = true;
+          learningtag = tags;
+        } else {
+          learningtag = tags[0];
+        }
+      }
+  
       console.log(
         `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
       );
@@ -80,10 +92,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     NotebookActions.executed.connect((_, args) => {
       const { cell, notebook, success } = args;
+      let tagValue = '';
       if (cell.model.type === 'code') {
+        if (nestedKeys) {
+          tagValue = cell.model.getMetadata(learningtag[0]);
+          for (let i = 1; i<learningtag.length; i++) {   
+            const descriptor = Object.getOwnPropertyDescriptor(tagValue, learningtag[i]);
+            tagValue = descriptor?.value;
+          }
+        } else {
+          tagValue = cell.model.getMetadata(learningtag as string);
+        }
         if (
           learningtag === '' ||
-          (learningtag !== '' && cell.model.getMetadata(learningtag))
+          (learningtag !== '' && tagValue)
         ) {
           const myCellModel = cell.model as CodeCellModel;
           const learnedCell = myCellModel.outputs.toJSON();
