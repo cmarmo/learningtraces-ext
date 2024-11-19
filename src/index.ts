@@ -61,7 +61,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     let learningpath: string = '';
     let nestedKeys = false;
     let trackedtags: string | string[] | string[][] = '';
-    let nestedTags: boolean[] = [];
+    const nestedTags: boolean[] = [];
 
     /**
      * Load the settings for this extension
@@ -140,7 +140,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           let tags: string[] = [];
           let cellMetadata = '';
           for (let i = 0; i < trackedtags.length; i++) {
-            let tag = trackedtags[i] as string;
+            const tag = trackedtags[i] as string;
             tags = tag.split('.');
             const trackValue = readRecursively(
               myCellModel,
