@@ -11,6 +11,24 @@ const d = new Date();
 const LEARNING_TRACE_FILE =
   '.learningtrace_' + d.getTime().toString() + '.jsonl';
 
+function readRecursively(
+  cellmodel: CodeCellModel,
+  nested: boolean,
+  tags: string | string[]
+) {
+  let tagValue: string = '';
+  if (nested) {
+    tagValue = cellmodel.getMetadata(tags[0]);
+    for (let i = 1; i < tags.length; i++) {
+      const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
+      tagValue = descriptor?.value;
+    }
+  } else {
+    tagValue = cellmodel.getMetadata(tags as string);
+  }
+  return tagValue;
+}
+
 async function writelt(
   contentsManager: ContentsManager,
   filename: string,
@@ -42,6 +60,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
     let learningtag: string | string[] = '';
     let learningpath: string = '';
     let nestedKeys = false;
+    let trackedtags: string | string[] | string[][] = '';
+    let nestedTags: boolean[] = [];
 
     /**
      * Load the settings for this extension
@@ -69,6 +89,22 @@ const plugin: JupyterFrontEndPlugin<void> = {
       console.log(
         `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
       );
+      trackedtags = setting.get('trackedtags').composite as string;
+      console.log(
+        `Learning Traces Extension Settings: trackedtags is set to '${trackedtags}'`
+      );
+      if (trackedtags !== '') {
+        const tobeTracked = trackedtags.split(',');
+        trackedtags = tobeTracked;
+        for (let i = 0; i < trackedtags.length; i++) {
+          tags = trackedtags[i].split('.');
+          if (tags.length > 1) {
+            nestedTags[nestedTags.length] = true;
+          } else {
+            nestedTags[nestedTags.length] = false;
+          }
+        }
+      }
     }
 
     // Wait for the application to be restored and
@@ -94,28 +130,39 @@ const plugin: JupyterFrontEndPlugin<void> = {
       const { cell, notebook, success } = args;
       let tagValue = '';
       if (cell.model.type === 'code') {
-        if (nestedKeys) {
-          tagValue = cell.model.getMetadata(learningtag[0]);
-          for (let i = 1; i < learningtag.length; i++) {
-            const descriptor = Object.getOwnPropertyDescriptor(
-              tagValue,
-              learningtag[i]
-            );
-            tagValue = descriptor?.value;
-          }
-        } else {
-          tagValue = cell.model.getMetadata(learningtag as string);
-        }
+        tagValue = readRecursively(
+          cell.model as CodeCellModel,
+          nestedKeys,
+          learningtag
+        );
         if (learningtag === '' || (learningtag !== '' && tagValue)) {
           const myCellModel = cell.model as CodeCellModel;
+          let tags: string[] = [];
+          let cellMetadata = '';
+          for (let i = 0; i < trackedtags.length; i++) {
+            let tag = trackedtags[i] as string;
+            tags = tag.split('.');
+            const trackValue = readRecursively(
+              myCellModel,
+              nestedTags[i],
+              tags
+            );
+            cellMetadata += '"' + trackedtags[i] + '" : "' + trackValue + '"';
+            if (i < trackedtags.length - 1) {
+              cellMetadata += ',';
+            }
+          }
+
           const learnedCell = myCellModel.outputs.toJSON();
           const jsonStringOutput =
             '{ "outputs" : ' +
             JSON.stringify(learnedCell) +
             ', "success" : ' +
             success +
+            ', ' +
+            cellMetadata +
             ', "notebook" : "' +
-            notebook.node.baseURI +
+            notebook.node.baseURI.split('tree/')[1] +
             '" }';
           const jsonCellOutput = JSON.parse(jsonStringOutput);
           learningContent += JSON.stringify(jsonCellOutput, undefined, 4);

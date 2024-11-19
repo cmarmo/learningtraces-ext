@@ -15,6 +15,12 @@
       "title": "learningpath",
       "description": "This is the path of the learning traces.",
       "default": "/"
+    },
+    "trackedtags": {
+      "type": "string",
+      "title": "trackedtags",
+      "description": "This is the list of additional informations stored in the learning trace.",
+      "default": ""
     }
   },
   "additionalProperties": false,
