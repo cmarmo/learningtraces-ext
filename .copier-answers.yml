@@ -1,3 +1,15 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: c46fa30
-_src_path: https://gitlab.com/cmarmo/jupyterlab-extension-ci-template
+_commit: v4.3.6
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: chiara.marmo@universite-paris-saclay.fr
+author_name: Chiara Marmo
+has_binder: false
+has_settings: true
+kind: frontend
+labextension_name: learning-traces-extension
+project_short_description: A jupyter extension that save learning traces when executing
+    a notebook.
+python_name: learning_traces_extension
+repository: ''
+test: true
+
