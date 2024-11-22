@@ -24,6 +24,24 @@ To remove the extension, execute:
 pip uninstall learning_traces_extension
 ```
 
+## Settings
+
+Settings are described in the the [plugin schema](schema/plugin.json).
+
+- _learningtag_ : is the tag used in cell metadata to identify learning cells
+  which output should be recorded;
+- _learningpath_ : is the path of the learning traces;
+- _trackedtags_ : is the list of additional informations stored in the learning trace.
+
+Please note that by default the learning trace is a hidden file, so Jupyter Lab
+should be launched with
+
+```bash
+jupyter lab --ContentsManager.allow_hidden=True
+```
+
+See the server [documentation](https://jupyterlab.readthedocs.io/en/stable/user/files.html#displaying-hidden-files) for more details.
+
 ## Contributing
 
 ### Development install
