@@ -13,8 +13,9 @@ A jupyter extension that save learning traces when executing a notebook.
 To install the extension, execute:
 
 ```bash
-pip install learning_traces_extension
+pip install git+https://github.com/cmarmo/learningtraces-ext.git
 ```
+<!--pip install learning_traces_extension-->
 
 ## Uninstall
 
