@@ -1,5 +1,6 @@
 # Changelog
 
-<!-- <START NEW CHANGELOG ENTRY> -->
+## Verison 0.3
 
-<!-- <END NEW CHANGELOG ENTRY> -->
+- **Bugfix**: fix trace generation when no custom tags are recorded.
+- **Feature**: add trace file name to the settings
