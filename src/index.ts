@@ -55,7 +55,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [ISettingRegistry],
   activate: async (app: JupyterFrontEnd, settings: ISettingRegistry) => {
-    console.log('JupyterLab extension learning_traces_extension is activated!');
+    console.log('JupyterLab extension learning-traces-extension is activated!');
 
     let learningtag: string | string[] = '';
     let learningpath: string = '';
