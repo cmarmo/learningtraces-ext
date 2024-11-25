@@ -7,9 +7,15 @@ image: python
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
 
+.dependencies:
+  before_script:
+    # install dependencies
+    - apt update
+    - apt install -y nodejs npm
+    - python -m pip install -U "jupyterlab>=4.0.0,<5"
+
 stages:
   - build
-
   - test
 
 
@@ -17,20 +23,15 @@ build:
   stage: build
   extends:
     - .rules
-  before_script:
-    # install dependencies
-    - apt update
-    - apt install -y nodejs npm
-    - python -m pip install -U "jupyterlab>=4.0.0,<5"
+    - .dependencies
+  script:
+    - set -eux
+    - python -m pip install .[test]
     - pip install pytest-check-links[cache]
     # lint checks
     - set -eux
     - jlpm
     - jlpm run lint:check
-  script:
-    - set -eux
-    - python -m pip install .[test]
-
     - jupyter labextension list
     - jupyter labextension list 2>&1 | grep -ie "learning-traces-extension.*OK"
     # Install dependencies for browser check
@@ -45,15 +46,11 @@ build:
     paths:
       - dist
 
-
 test:
   stage: test
   extends:
     - .rules
-  before_script:
-    # install dependencies
-    - apt update
-    - apt install -y nodejs npm
+    - .dependencies
   script:
     - set -eux
     - python -m pip install .[test]
