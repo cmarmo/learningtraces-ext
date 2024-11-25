@@ -15,6 +15,7 @@ To install the extension, execute:
 ```bash
 pip install git+https://github.com/cmarmo/learningtraces-ext.git
 ```
+
 <!--pip install learning_traces_extension-->
 
 ## Uninstall
