@@ -30,11 +30,12 @@ Settings are described in the the [plugin schema](schema/plugin.json).
 
 - _learningtag_ : is the tag used in cell metadata to identify learning cells
   which output should be recorded;
+- _learningtrace_ : is the name of the file containing the learning traces;
 - _learningpath_ : is the path of the learning traces;
 - _trackedtags_ : is the list of additional informations stored in the learning trace.
 
-Please note that by default the learning trace is a hidden file, so Jupyter Lab
-should be launched with
+Please note that by default the learning trace is a hidden file, unless a non-hidden
+name has been set in the settings, Jupyter Lab should be launched with
 
 ```bash
 jupyter lab --ContentsManager.allow_hidden=True

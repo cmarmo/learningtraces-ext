@@ -58,6 +58,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
     let learningtag: string | string[] = '';
+    let learningtrace: string = '';
     let learningpath: string = '';
     let nestedKeys = false;
     let trackedtags: string | string[] | string[][] = '';
@@ -84,6 +85,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       console.log(
         `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
+      );
+      learningtrace = setting.get('learningtrace').composite as string;
+      if (learningtrace === '') {
+        learningtrace = LEARNING_TRACE_FILE;
+      }
+      console.log(
+        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
       );
       learningpath = setting.get('learningpath').composite as string;
       console.log(
@@ -166,7 +174,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
             '" }';
           const jsonCellOutput = JSON.parse(jsonStringOutput);
           learningContent += JSON.stringify(jsonCellOutput, undefined, 4);
-          const filename = learningpath + '/' + LEARNING_TRACE_FILE;
+          const filename = learningpath + '/' + learningtrace;
           writelt(contents, filename, learningContent);
         }
       }
