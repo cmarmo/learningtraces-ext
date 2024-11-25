@@ -22,6 +22,7 @@ build:
     - apt update
     - apt install -y nodejs npm
     - python -m pip install -U "jupyterlab>=4.0.0,<5"
+    - pip install pytest-check-links[cache]
     # lint checks
     - set -eux
     - jlpm
@@ -38,6 +39,8 @@ build:
     # Package the extension
     - pip install build
     - python -m build
+    # Check links
+    - pytest-check-links
   artifacts:
     paths:
       - dist

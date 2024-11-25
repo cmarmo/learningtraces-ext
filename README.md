@@ -1,7 +1,5 @@
 # learning_traces_extension
 
-[![Github Actions Status](/workflows/Build/badge.svg)](/actions/workflows/build.yml)
-
 A jupyter extension that save learning traces when executing a notebook.
 
 ## Requirements
