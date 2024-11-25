@@ -91,7 +91,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         learningtrace = LEARNING_TRACE_FILE;
       }
       console.log(
-        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
+        `Learning Traces Extension Settings: learningtrace is set to '${learningtrace}'`
       );
       learningpath = setting.get('learningpath').composite as string;
       console.log(
@@ -155,10 +155,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
               nestedTags[i],
               tags
             );
-            cellMetadata += '"' + trackedtags[i] + '" : "' + trackValue + '"';
-            if (i < trackedtags.length - 1) {
-              cellMetadata += ',';
-            }
+            cellMetadata += ', "' + trackedtags[i] + '" : "' + trackValue + '"';
           }
 
           const learnedCell = myCellModel.outputs.toJSON();
@@ -167,7 +164,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
             JSON.stringify(learnedCell) +
             ', "success" : ' +
             success +
-            ', ' +
             cellMetadata +
             ', "notebook" : "' +
             notebook.node.baseURI.split('tree/')[1] +
