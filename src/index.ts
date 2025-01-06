@@ -1,15 +1,23 @@
+import YAML from 'yaml';
+
 import { ContentsManager } from '@jupyterlab/services';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { NotebookActions } from '@jupyterlab/notebook';
+import { NotebookActions, INotebookTracker } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells';
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
 const LEARNING_TRACE_FILE =
   '.learningtrace_' + d.getTime().toString() + '.jsonl';
+const LOCAL_CONFIG_FILE = 'learningtrace_config.yml';
+
+async function getData(contents: ContentsManager, url: string) {
+  const config = YAML.parse((await contents.get(url)).content);
+  return config;
+}
 
 function readRecursively(
   cellmodel: CodeCellModel,
@@ -53,14 +61,19 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description:
     'A jupyter extension that save learning traces when executing a notebook.',
   autoStart: true,
-  requires: [ISettingRegistry],
-  activate: async (app: JupyterFrontEnd, settings: ISettingRegistry) => {
+  requires: [ISettingRegistry, INotebookTracker],
+  activate: async (
+    app: JupyterFrontEnd,
+    settings: ISettingRegistry,
+    tracker: INotebookTracker
+  ) => {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
+    let local: boolean = false;
     let learningtag: string | string[] = '';
     let learningtrace: string = '';
     let learningpath: string = '';
-    let nestedKeys = false;
+    let nestedKeys: boolean = false;
     let trackedtags: string | string[] | string[][] = '';
     const nestedTags: boolean[] = [];
 
@@ -71,7 +84,35 @@ const plugin: JupyterFrontEndPlugin<void> = {
      */
     function loadSetting(setting: ISettingRegistry.ISettings): void {
       // Read the settings and convert to the correct type
+
+      local = setting.get('local').composite as boolean;
+      console.debug(
+        `Learning Traces Extension Settings: local is set to '${local}'`
+      );
+
       learningtag = setting.get('learningtag').composite as string;
+      console.debug(
+        `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
+      );
+
+      learningtrace = setting.get('learningtrace').composite as string;
+      if (learningtrace === '') {
+        learningtrace = LEARNING_TRACE_FILE;
+      }
+      console.debug(
+        `Learning Traces Extension Settings: learningtrace is set to '${learningtrace}'`
+      );
+
+      learningpath = setting.get('learningpath').composite as string;
+      console.debug(
+        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
+      );
+
+      trackedtags = setting.get('trackedtags').composite as string;
+      console.debug(
+        `Learning Traces Extension Settings: trackedtags is set to '${trackedtags}'`
+      );
+
       let tags: string[] = [];
       if (learningtag !== '') {
         tags = learningtag.split('.');
@@ -83,24 +124,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
       }
 
-      console.log(
-        `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
-      );
-      learningtrace = setting.get('learningtrace').composite as string;
-      if (learningtrace === '') {
-        learningtrace = LEARNING_TRACE_FILE;
-      }
-      console.log(
-        `Learning Traces Extension Settings: learningtrace is set to '${learningtrace}'`
-      );
-      learningpath = setting.get('learningpath').composite as string;
-      console.log(
-        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
-      );
-      trackedtags = setting.get('trackedtags').composite as string;
-      console.log(
-        `Learning Traces Extension Settings: trackedtags is set to '${trackedtags}'`
-      );
       if (trackedtags !== '') {
         const tobeTracked = trackedtags.split(',');
         trackedtags = tobeTracked;
@@ -135,7 +158,61 @@ const plugin: JupyterFrontEndPlugin<void> = {
     let learningContent = '';
 
     NotebookActions.executed.connect((_, args) => {
-      const { cell, notebook, success } = args;
+      const { cell, success } = args;
+      const path = tracker.currentWidget?.context.path;
+      const pathComponents = path?.split('/') || [];
+      if (local) {
+        const repolevels = pathComponents.length;
+        let i = repolevels;
+        let get_success = false;
+        while (i > 0 && !get_success) {
+          i -= 1;
+          let configpath = '';
+          for (let j = 0; j < i; j++) {
+            configpath += pathComponents[j] + '/';
+          }
+          getData(contents, '/' + configpath + LOCAL_CONFIG_FILE)
+            .then(config => {
+              learningtrace = config.learningtrace || learningtrace;
+              learningpath = config.learningpath || learningpath;
+              let tags: string[] = [];
+              if (
+                config.hasOwnProperty('learningtag') &&
+                config.learningtag !== ''
+              ) {
+                tags = config.learningtag.split('.');
+                if (tags.length > 1) {
+                  nestedKeys = true;
+                  learningtag = tags;
+                } else {
+                  learningtag = tags[0];
+                }
+              }
+
+              if (
+                config.hasOwnProperty('trackedtags') &&
+                config.trackedtags !== ''
+              ) {
+                const tobeTracked = config.trackedtags.split(',');
+                for (let i = 0; i < tobeTracked.length; i++) {
+                  tags = tobeTracked[i].split('.');
+                  if (tags.length > 1) {
+                    nestedTags[nestedTags.length] = true;
+                  } else {
+                    nestedTags[nestedTags.length] = false;
+                  }
+                  trackedtags = tobeTracked;
+                }
+              }
+              get_success = true;
+            })
+            .catch((error: any) => {
+              console.warn(
+                `Cannot read '${'/' + configpath + LOCAL_CONFIG_FILE}' local configuration: '${error.message}'`
+              );
+            });
+        }
+      }
       let tagValue = '';
       if (cell.model.type === 'code') {
         tagValue = readRecursively(
@@ -166,7 +243,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
             success +
             cellMetadata +
             ', "notebook" : "' +
-            notebook.node.baseURI.split('tree/')[1] +
+            path +
             '" }';
           const jsonCellOutput = JSON.parse(jsonStringOutput);
           learningContent += JSON.stringify(jsonCellOutput, undefined, 4);

@@ -4,28 +4,34 @@
   "description": "learning-traces-extension settings.",
   "type": "object",
   "properties": {
+    "local": {
+      "type": "boolean",
+      "title": "local",
+      "description": "Tell whether the configuration file should be looked for locally.",
+      "default": false
+    },
     "learningtag": {
       "type": "string",
       "title": "learningtag",
-      "description": "This is the tag used in cell metadata to identify learning cells.",
+      "description": "The tag used in cell metadata to identify learning cells.",
       "default": ""
     },
     "learningtrace": {
       "type": "string",
       "title": "learningtrace",
-      "description": "This is the name of the file containing the learning traces.",
+      "description": "The name of the file containing the learning traces.",
       "default": ""
     },
     "learningpath": {
       "type": "string",
       "title": "learningpath",
-      "description": "This is the path of the learning traces.",
+      "description": "The path of the learning traces.",
       "default": "/"
     },
     "trackedtags": {
       "type": "string",
       "title": "trackedtags",
-      "description": "This is the list of additional informations stored in the learning trace.",
+      "description": "The list of additional informations stored in the learning trace.",
       "default": ""
     }
   },
