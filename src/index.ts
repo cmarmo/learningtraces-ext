@@ -246,9 +246,16 @@ const plugin: JupyterFrontEndPlugin<void> = {
             path +
             '" }';
           const jsonCellOutput = JSON.parse(jsonStringOutput);
-          learningContent += JSON.stringify(jsonCellOutput, undefined, 4);
           const filename = learningpath + '/' + learningtrace;
-          writelt(contents, filename, learningContent);
+          contents.get(filename)
+            .then((filemodel) => {
+              learningContent = filemodel.content;
+            })
+            .catch((error) => { console.warn(error); })
+            .then(() => {
+              learningContent += JSON.stringify(jsonCellOutput, undefined, 4);
+              writelt(contents, filename, learningContent); 
+            })
         }
       }
     });

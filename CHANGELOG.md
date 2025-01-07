@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.4.1
+
+- **Bugfix**: learning traces files can be appended
+
 ## Version 0.4
 
 - **Feature**: add local configuration
