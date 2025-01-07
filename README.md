@@ -28,11 +28,13 @@ pip uninstall learning_traces_extension
 
 Settings are described in the the [plugin schema](schema/plugin.json).
 
-- _learningtag_ : is the tag used in cell metadata to identify learning cells
+- _local_ : whether the configuration file should be looked for locally,
+  the local configuration file should be called `learningtrace_config.yml`
+- _learningtag_ : the tag used in cell metadata to identify learning cells
   which output should be recorded;
-- _learningtrace_ : is the name of the file containing the learning traces;
-- _learningpath_ : is the path of the learning traces;
-- _trackedtags_ : is the list of additional informations stored in the learning trace.
+- _learningtrace_ : the name of the file containing the learning traces;
+- _learningpath_ : the path of the learning traces;
+- _trackedtags_ : the list of additional informations stored in the learning trace.
 
 Please note that by default the learning trace is a hidden file, unless a non-hidden
 name has been set in the settings, Jupyter Lab should be launched with

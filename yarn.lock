@@ -6841,7 +6841,7 @@ __metadata:
     stylelint-csstree-validator: ^3.0.0
     stylelint-prettier: ^4.0.0
     typescript: ~5.0.2
-    yaml: ^2.7.0
+    yaml: 2.7.0
     yjs: ^13.5.0
   languageName: unknown
   linkType: soft
@@ -9737,7 +9737,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.7.0":
+"yaml@npm:2.7.0":
   version: 2.7.0
   resolution: "yaml@npm:2.7.0"
   bin:
