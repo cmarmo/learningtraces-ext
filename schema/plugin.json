@@ -8,7 +8,7 @@
       "type": "boolean",
       "title": "local",
       "description": "Tell whether the configuration file should be looked for locally.",
-      "default": false
+      "default": true
     },
     "learningtag": {
       "type": "string",

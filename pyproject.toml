@@ -28,9 +28,9 @@ dynamic = ["version", "description", "authors", "urls", "keywords"]
 
 [tool.hatch.version]
 # release configuration
-# source = "nodejs"
+source = "nodejs"
 # development configuration
-source = "vcs"
+# source = "vcs"
 
 [tool.hatch.metadata.hooks.nodejs]
 fields = ["description", "authors", "urls", "keywords"]
