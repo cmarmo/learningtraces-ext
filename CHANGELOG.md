@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.4.3
+
+- **Bugfix**: correctly manage the absence of the learning tag in a cell
+
 ### Version 0.4.2
 
 - **Default Settings**: change default local configuration to `true`

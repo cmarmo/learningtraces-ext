@@ -27,9 +27,11 @@ function readRecursively(
   let tagValue: string = '';
   if (nested) {
     tagValue = cellmodel.getMetadata(tags[0]);
-    for (let i = 1; i < tags.length; i++) {
-      const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
-      tagValue = descriptor?.value;
+    if (tagValue != undefined) {
+      for (let i = 1; i < tags.length; i++) {
+        const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
+        tagValue = descriptor?.value;
+      }
     }
   } else {
     tagValue = cellmodel.getMetadata(tags as string);
@@ -220,7 +222,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           nestedKeys,
           learningtag
         );
-        if (learningtag === '' || (learningtag !== '' && tagValue)) {
+        if (learningtag !== '' && tagValue) {
           const myCellModel = cell.model as CodeCellModel;
           let tags: string[] = [];
           let cellMetadata = '';
