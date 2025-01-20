@@ -27,7 +27,7 @@ function readRecursively(
   let tagValue: string = '';
   if (nested) {
     tagValue = cellmodel.getMetadata(tags[0]);
-    if (tagValue != undefined) {
+    if (tagValue !== undefined) {
       for (let i = 1; i < tags.length; i++) {
         const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
         tagValue = descriptor?.value;
@@ -179,7 +179,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
               learningpath = config.learningpath || learningpath;
               let tags: string[] = [];
               if (
-                config.hasOwnProperty('learningtag') &&
+                Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
                 config.learningtag !== ''
               ) {
                 tags = config.learningtag.split('.');
@@ -192,7 +192,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
               }
 
               if (
-                config.hasOwnProperty('trackedtags') &&
+                Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
                 config.trackedtags !== ''
               ) {
                 const tobeTracked = config.trackedtags.split(',');
