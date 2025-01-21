@@ -250,7 +250,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
               console.warn(error);
             })
             .then(() => {
-              learningContent += JSON.stringify(jsonCellOutput, undefined, 4);
+              learningContent += JSON.stringify(jsonCellOutput);
               writelt(contents, filename, learningContent);
             });
         }
