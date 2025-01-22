@@ -2,6 +2,7 @@
 
 ### Version 0.4.4
 
+- **Feature**: add timestamp to the learning trace
 - **Bugfix**: learning traces are jsonlines files
 - **Bugfix**: remnants blank spaces removed from recursive tags
 

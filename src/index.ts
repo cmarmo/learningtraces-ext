@@ -207,6 +207,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
             );
           });
       }
+      const time = new Date();
+      const timestamp =
+        time.getFullYear().toPrecision(4).toString() +
+        '-' +
+        ('0' + (time.getMonth() + 1).toString()).slice(-2) +
+        '-' +
+        ('0' + time.getDate().toString()).slice(-2) +
+        '-' +
+        ('0' + time.getHours().toString()).slice(-2) +
+        ('0' + time.getMinutes().toString()).slice(-2) +
+        ('0' + time.getSeconds().toString()).slice(-2);
       let tagValue = '';
       if (cell.model.type === 'code') {
         tagValue = readRecursively(
@@ -231,7 +242,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
           const learnedCell = myCellModel.outputs.toJSON();
           const jsonStringOutput =
-            '{ "outputs" : ' +
+            '{ "time": "' +
+            timestamp +
+            '", "outputs" : ' +
             JSON.stringify(learnedCell) +
             ', "success" : ' +
             success +
