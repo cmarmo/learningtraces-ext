@@ -219,14 +219,14 @@ const plugin: JupyterFrontEndPlugin<void> = {
           let tags: string[] = [];
           let cellMetadata = '';
           for (let i = 0; i < trackedtags.length; i++) {
-            const tag = trackedtags[i] as string;
+            const tag = (trackedtags[i] as string).trim();
             tags = tag.split('.');
             const trackValue = readRecursively(
               myCellModel,
               nestedTags[i],
               tags
             );
-            cellMetadata += ', "' + trackedtags[i] + '" : "' + trackValue + '"';
+            cellMetadata += ', "' + tag + '" : "' + trackValue + '"';
           }
 
           const learnedCell = myCellModel.outputs.toJSON();
