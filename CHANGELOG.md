@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.4.4
+
+- **Bugfix**: learning traces are jsonlines files
+
 ### Version 0.4.3
 
 - **Bugfix**: correctly manage the absence of the learning tag in a cell
