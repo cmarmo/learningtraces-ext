@@ -1,8 +1,8 @@
 # Changelog
 
-## Version 0.5
+## Version 0.4.5
 
-- **Settings**: `local` setting has been removed
+- **Bugfix**: fix `local` setting
 
 ### Version 0.4.4
 

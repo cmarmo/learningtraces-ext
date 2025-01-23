@@ -71,6 +71,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
+    let local: boolean = false;
     let learningtag: string | string[] = '';
     let learningtrace: string = '';
     let learningpath: string = '';
@@ -86,7 +87,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
     function loadSetting(setting: ISettingRegistry.ISettings): void {
       // Read the settings and convert to the correct type
 
-      learningtag = setting.get('learningtag').composite as string;
+      local = setting.get('local').composite as boolean;
+      console.debug(
+        `Learning Traces Extension Settings: local is set to '${local}'`
+      );
+
+     learningtag = setting.get('learningtag').composite as string;
       console.debug(
         `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
       );
@@ -156,56 +162,58 @@ const plugin: JupyterFrontEndPlugin<void> = {
     NotebookActions.executed.connect((_, args) => {
       const { cell, success } = args;
       const path = tracker.currentWidget?.context.path;
-      const pathComponents = path?.split('/') || [];
-      const repolevels = pathComponents.length;
-      let i = repolevels;
-      let get_success = false;
-      while (i > 0 && !get_success) {
-        i -= 1;
-        let configpath = '';
-        for (let j = 0; j < i; j++) {
-          configpath += pathComponents[j] + '/';
-        }
-        getData(contents, '/' + configpath + LOCAL_CONFIG_FILE)
-          .then(config => {
-            learningtrace = config.learningtrace || learningtrace;
-            learningpath = config.learningpath || learningpath;
-            let tags: string[] = [];
-            if (
-              Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
-              config.learningtag !== ''
-            ) {
-              tags = config.learningtag.split('.');
-              if (tags.length > 1) {
-                nestedKeys = true;
-                learningtag = tags;
-              } else {
-                learningtag = tags[0];
-              }
-            }
-
-            if (
-              Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
-              config.trackedtags !== ''
-            ) {
-              const tobeTracked = config.trackedtags.split(',');
-              for (let i = 0; i < tobeTracked.length; i++) {
-                tags = tobeTracked[i].split('.');
+      if (local) {
+        const pathComponents = path?.split('/') || [];
+        const repolevels = pathComponents.length;
+        let i = repolevels;
+        let get_success = false;
+        while (i > 0 && !get_success) {
+          i -= 1;
+          let configpath = '';
+          for (let j = 0; j < i; j++) {
+            configpath += pathComponents[j] + '/';
+          }
+          getData(contents, '/' + configpath + LOCAL_CONFIG_FILE)
+            .then(config => {
+              learningtrace = config.learningtrace || learningtrace;
+              learningpath = config.learningpath || learningpath;
+              let tags: string[] = [];
+              if (
+                Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
+                config.learningtag !== ''
+              ) {
+                tags = config.learningtag.split('.');
                 if (tags.length > 1) {
-                  nestedTags[nestedTags.length] = true;
+                  nestedKeys = true;
+                  learningtag = tags;
                 } else {
-                  nestedTags[nestedTags.length] = false;
+                  learningtag = tags[0];
                 }
-                trackedtags = tobeTracked;
               }
-            }
-            get_success = true;
-          })
-          .catch((error: any) => {
-            console.warn(
-              `Cannot read '${'/' + configpath + LOCAL_CONFIG_FILE}' local configuration: '${error.message}'`
-            );
-          });
+
+              if (
+                Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
+                config.trackedtags !== ''
+              ) {
+                const tobeTracked = config.trackedtags.split(',');
+                for (let i = 0; i < tobeTracked.length; i++) {
+                  tags = tobeTracked[i].split('.');
+                  if (tags.length > 1) {
+                    nestedTags[nestedTags.length] = true;
+                  } else {
+                    nestedTags[nestedTags.length] = false;
+                  }
+                  trackedtags = tobeTracked;
+                }
+              }
+              get_success = true;
+            })
+            .catch((error: any) => {
+              console.warn(
+                `Cannot read '${'/' + configpath + LOCAL_CONFIG_FILE}' local configuration: '${error.message}'`
+              );
+            });
+        }
       }
       const time = new Date();
       const timestamp =
