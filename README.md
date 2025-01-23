@@ -27,9 +27,10 @@ pip uninstall learning_traces_extension
 ## Settings
 
 Settings are described in the the [plugin schema](schema/plugin.json).
-
-- _local_ : whether the configuration file should be looked for locally,
-  the local configuration file should be called `learningtrace_config.yml`
+They can be programmatically set using `default_setting_overrides.json`,
+or in local configuration files which should be called `learningtrace_config.yml`
+and placed at any level of the notebook directory tree.
+ 
 - _learningtag_ : the tag used in cell metadata to identify learning cells
   which output should be recorded;
 - _learningtrace_ : the name of the file containing the learning traces;

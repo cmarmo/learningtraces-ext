@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5
+
+- **Settings**: `local` setting has been removed
+
 ### Version 0.4.4
 
 - **Feature**: add timestamp to the learning trace
