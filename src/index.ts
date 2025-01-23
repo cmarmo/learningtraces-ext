@@ -92,7 +92,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         `Learning Traces Extension Settings: local is set to '${local}'`
       );
 
-     learningtag = setting.get('learningtag').composite as string;
+      learningtag = setting.get('learningtag').composite as string;
       console.debug(
         `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
       );
