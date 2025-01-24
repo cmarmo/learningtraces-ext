@@ -77,6 +77,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
     let learningpath: string = '';
     let nestedKeys: boolean = false;
     let trackedtags: string | string[] | string[][] = '';
+    let trackedoutputs: string | string[] = '';
+    let alloutput: boolean = false;
     const nestedTags: boolean[] = [];
 
     /**
@@ -115,6 +117,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
         `Learning Traces Extension Settings: trackedtags is set to '${trackedtags}'`
       );
 
+      trackedoutputs = setting.get('trackedoutputs').composite as string;
+      console.log(
+        `Learning Traces Extension Settings: trackedoutputs is set to '${trackedoutputs}'`
+      )
+
       let tags: string[] = [];
       if (learningtag !== '') {
         tags = learningtag.split('.');
@@ -137,6 +144,16 @@ const plugin: JupyterFrontEndPlugin<void> = {
             nestedTags[nestedTags.length] = false;
           }
         }
+      }
+
+      if (trackedoutputs == 'all') {
+        alloutput = true;
+      } else {
+        const outputs = trackedoutputs.split(',');
+        for (let i = 0; i < outputs.length; i++) {
+            outputs[i].trim();
+        }
+        trackedoutputs = outputs;
       }
     }
 
@@ -206,6 +223,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
                   trackedtags = tobeTracked;
                 }
               }
+              if (
+                Object.prototype.hasOwnProperty.call(config, 'trackedoutputs') &&
+                config.trackedoutputs !== ''
+              ) {
+                if (config.trackedoutputs == 'all') {
+                  alloutput = true;
+                } else {
+                  const outputs = config.trackedoutputs.split(',');
+                  for (let i = 0; i < outputs.length; i++) {
+                      outputs[i].trim();
+                  }
+                  trackedoutputs = outputs;
+                }
+              }
               get_success = true;
             })
             .catch((error: any) => {
@@ -249,11 +280,26 @@ const plugin: JupyterFrontEndPlugin<void> = {
           }
 
           const learnedCell = myCellModel.outputs.toJSON();
+          let outputString: string = "";
+          if (alloutput) {
+            outputString = ', "outputs" : ' + JSON.stringify(learnedCell)
+          } else {
+            if (trackedoutputs[0] !== "none") {
+              outputString = ', "outputs" : [';
+              for (let output of learnedCell) {
+                for (let outputType of trackedoutputs) {
+                  if (output.output_type == outputType) {
+                    outputString += JSON.stringify(output);
+                  }
+                }
+              }
+              outputString += '],';
+            }
+          }
           const jsonStringOutput =
             '{ "time": "' +
-            timestamp +
-            '", "outputs" : ' +
-            JSON.stringify(learnedCell) +
+            timestamp + '"' +
+            outputString +
             ', "success" : ' +
             success +
             cellMetadata +

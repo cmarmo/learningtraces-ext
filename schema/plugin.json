@@ -33,6 +33,12 @@
       "title": "trackedtags",
       "description": "The list of additional informations stored in the learning trace.",
       "default": ""
+    },
+    "trackedoutputs": {
+      "type": "string",
+      "title": "trackedoutputs",
+      "description": "The list of output types stored in the learning trace.",
+      "default": "none"
     }
   },
   "additionalProperties": false,

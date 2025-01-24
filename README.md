@@ -38,6 +38,7 @@ and placed at any level of the notebook directory tree.
 - _learningtrace_ : the name of the file containing the learning traces;
 - _learningpath_ : the path of the learning traces;
 - _trackedtags_ : the list of additional informations stored in the learning trace.
+- _trackedoutputs_ : The list of output types stored in the learning trace.
 
 Please note that by default the learning trace is a hidden file, unless a non-hidden
 name has been set in the settings, Jupyter Lab should be launched with

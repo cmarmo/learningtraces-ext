@@ -1,6 +1,10 @@
 # Changelog
 
-## Version 0.4.5
+## Version 0.5
+
+- **Settings**: specify which kind of output type we want to track
+
+### Version 0.4.5
 
 - **Bugfix**: fix `local` setting
 
@@ -16,7 +20,7 @@
 
 ### Version 0.4.2
 
-- **Default Settings**: change default local configuration to `true`
+- **Settings**: change default local configuration to `true`
 
 ### Version 0.4.1
 
