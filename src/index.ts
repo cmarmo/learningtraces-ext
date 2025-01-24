@@ -120,7 +120,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       trackedoutputs = setting.get('trackedoutputs').composite as string;
       console.log(
         `Learning Traces Extension Settings: trackedoutputs is set to '${trackedoutputs}'`
-      )
+      );
 
       let tags: string[] = [];
       if (learningtag !== '') {
@@ -146,12 +146,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
       }
 
-      if (trackedoutputs == 'all') {
+      if (trackedoutputs === 'all') {
         alloutput = true;
       } else {
         const outputs = trackedoutputs.split(',');
         for (let i = 0; i < outputs.length; i++) {
-            outputs[i].trim();
+          outputs[i].trim();
         }
         trackedoutputs = outputs;
       }
@@ -224,15 +224,18 @@ const plugin: JupyterFrontEndPlugin<void> = {
                 }
               }
               if (
-                Object.prototype.hasOwnProperty.call(config, 'trackedoutputs') &&
+                Object.prototype.hasOwnProperty.call(
+                  config,
+                  'trackedoutputs'
+                ) &&
                 config.trackedoutputs !== ''
               ) {
-                if (config.trackedoutputs == 'all') {
+                if (config.trackedoutputs === 'all') {
                   alloutput = true;
                 } else {
                   const outputs = config.trackedoutputs.split(',');
                   for (let i = 0; i < outputs.length; i++) {
-                      outputs[i].trim();
+                    outputs[i].trim();
                   }
                   trackedoutputs = outputs;
                 }
@@ -280,15 +283,15 @@ const plugin: JupyterFrontEndPlugin<void> = {
           }
 
           const learnedCell = myCellModel.outputs.toJSON();
-          let outputString: string = "";
+          let outputString: string = '';
           if (alloutput) {
-            outputString = ', "outputs" : ' + JSON.stringify(learnedCell)
+            outputString = ', "outputs" : ' + JSON.stringify(learnedCell);
           } else {
-            if (trackedoutputs[0] !== "none") {
+            if (trackedoutputs[0] !== 'none') {
               outputString = ', "outputs" : [';
-              for (let output of learnedCell) {
-                for (let outputType of trackedoutputs) {
-                  if (output.output_type == outputType) {
+              for (const output of learnedCell) {
+                for (const outputType of trackedoutputs) {
+                  if (output.output_type === outputType) {
                     outputString += JSON.stringify(output);
                   }
                 }
@@ -298,7 +301,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
           }
           const jsonStringOutput =
             '{ "time": "' +
-            timestamp + '"' +
+            timestamp +
+            '"' +
             outputString +
             ', "success" : ' +
             success +
