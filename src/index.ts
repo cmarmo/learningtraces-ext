@@ -118,7 +118,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       );
 
       trackedoutputs = setting.get('trackedoutputs').composite as string;
-      console.log(
+      console.debug(
         `Learning Traces Extension Settings: trackedoutputs is set to '${trackedoutputs}'`
       );
 
@@ -296,7 +296,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
                   }
                 }
               }
-              outputString += '],';
+              outputString += ']';
             }
           }
           const jsonStringOutput =
