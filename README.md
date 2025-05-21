@@ -37,8 +37,10 @@ and placed at any level of the notebook directory tree.
   which output should be recorded;
 - _learningtrace_ : the name of the file containing the learning traces;
 - _learningpath_ : the path of the learning traces;
-- _trackedtags_ : the list of additional informations stored in the learning trace.
-- _trackedoutputs_ : The list of output types stored in the learning trace.
+- _trackedtags_ : the list of additional informations stored in the learning trace;
+- _trackedoutputs_ : the list of output types stored in the learning trace;
+  'all' means all output types are stored, 'none' means no output is recorded,
+  otherwise a list of types specified in the [notebook model](https://nbformat.readthedocs.io/en/latest/format_description.html#code-cell-outputs) should be specified.
 
 Please note that by default the learning trace is a hidden file, unless a non-hidden
 name has been set in the settings, Jupyter Lab should be launched with
