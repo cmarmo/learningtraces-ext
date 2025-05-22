@@ -8,6 +8,8 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { NotebookActions, INotebookTracker } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells';
+import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
+
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
 const LEARNING_TRACE_FILE =
@@ -38,7 +40,7 @@ function readRecursively(
   return tagValue;
 }
 
-async function writelt(
+/*async function writelt(
   contentsManager: ContentsManager,
   filename: string,
   content: string
@@ -52,7 +54,7 @@ async function writelt(
   } catch (err) {
     console.log(err);
   }
-}
+}*/
 
 /**
  * Initialization data for the jupyterlab learning traces extension.
@@ -62,14 +64,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description:
     'A jupyter extension that save learning traces when executing a notebook.',
   autoStart: true,
-  requires: [ISettingRegistry, INotebookTracker],
+  requires: [
+    ISettingRegistry,
+    IJupyterLabPioneer,
+    INotebookTracker
+  ],
   activate: async (
     app: JupyterFrontEnd,
     settings: ISettingRegistry,
+    pioneer: IJupyterLabPioneer,
     tracker: INotebookTracker
   ) => {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
+    console.log(pioneer)
     let local: boolean = false;
     let learningtag: string | string[] = '';
     let learningtrace: string = '';
@@ -321,7 +329,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
             })
             .then(() => {
               learningContent += JSON.stringify(jsonCellOutput) + '\n';
-              writelt(contents, filename, learningContent);
+              console.log(learningContent)
+              //writelt(contents, filename, learningContent);
             });
         }
       }
