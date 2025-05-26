@@ -24,21 +24,16 @@ function readRecursively(
   nested: boolean,
   tags: string | string[]
 ) {
-  let tagValue: string = '';
-  if (nested) {
-    tagValue = cellmodel.getMetadata(tags[0]);
-    if (tagValue !== undefined) {
-      for (let i = 1; i < tags.length; i++) {
-        const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
-        tagValue = descriptor?.value;
-      }
+  if (typeof(tags) === "string") {
+    tags = [tags]
+  }
+  let tagValue: string = cellmodel.getMetadata(tags[0]);
+  if (tagValue !== undefined) {
+    for (let i = 1; i < tags.length; i++) {
+      const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
+      tagValue = descriptor?.value;
+      console.log(tagValue);
     }
-  } else {
-    const descriptor = Object.getOwnPropertyDescriptor(
-      tagValue,
-      tags as string
-    );
-    tagValue = descriptor?.value;
   }
   return tagValue;
 }
