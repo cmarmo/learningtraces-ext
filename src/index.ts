@@ -34,7 +34,11 @@ function readRecursively(
       }
     }
   } else {
-    tagValue = cellmodel.getMetadata(tags as string);
+    const descriptor = Object.getOwnPropertyDescriptor(
+      tagValue,
+      tags as string
+    );
+    tagValue = descriptor?.value;
   }
   return tagValue;
 }
