@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.5.1
+
+- **Bugfix**: fix tag value read as Object
+
 ## Version 0.5
 
 - **Settings**: specify which kind of output type we want to track
