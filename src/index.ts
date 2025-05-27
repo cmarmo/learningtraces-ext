@@ -24,8 +24,8 @@ function readRecursively(
   nested: boolean,
   tags: string | string[]
 ) {
-  if (typeof(tags) === "string") {
-    tags = [tags]
+  if (typeof tags === 'string') {
+    tags = [tags];
   }
   let tagValue: string = cellmodel.getMetadata(tags[0]);
   if (tagValue !== undefined) {
