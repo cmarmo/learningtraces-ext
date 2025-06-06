@@ -9,6 +9,7 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { NotebookActions, INotebookTracker } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells';
 import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
+import { Exporter } from 'jupyterlab-pioneer/lib/types';
 
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
@@ -39,22 +40,6 @@ function readRecursively(
   }
   return tagValue;
 }
-
-/*async function writelt(
-  contentsManager: ContentsManager,
-  filename: string,
-  content: string
-) {
-  try {
-    contentsManager.save(filename, {
-      content: content,
-      format: 'text',
-      type: 'file'
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}*/
 
 /**
  * Initialization data for the jupyterlab learning traces extension.
@@ -183,6 +168,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const contents = new ContentsManager();
     let learningContent = '';
 
+    const notebookPanel = tracker.currentWidget;
+    const event = { 'name': 'CellExecuteEvent'};
+
+    const exporter_type: Exporter = {
+      type: 'file_exporter',
+      args: {
+        path: 'log',
+        id: ''
+      }
+    }
+    
+    if (notebookPanel != null) {
+        await pioneer.publishEvent(notebookPanel, event, exporter_type , false );
+    }
     NotebookActions.executed.connect((_, args) => {
       const { cell, success } = args;
       const path = tracker.currentWidget?.context.path;
@@ -330,7 +329,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
             .then(() => {
               learningContent += JSON.stringify(jsonCellOutput) + '\n';
               console.log(learningContent)
-              //writelt(contents, filename, learningContent);
             });
         }
       }
