@@ -1,6 +1,5 @@
 import YAML from 'yaml';
 
-import { ContentsManager } from '@jupyterlab/services';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
@@ -10,6 +9,7 @@ import { NotebookActions, INotebookTracker } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells';
 import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
 import { Exporter } from 'jupyterlab-pioneer/lib/types';
+import { ContentsManager } from '@jupyterlab/services';
 
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
@@ -62,11 +62,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
-    console.log(pioneer)
     let local: boolean = false;
     let learningtag: string | string[] = '';
     let learningtrace: string = '';
-    let learningpath: string = '';
     let nestedKeys: boolean = false;
     let trackedtags: string | string[] | string[][] = '';
     let trackedoutputs: string | string[] = '';
@@ -97,11 +95,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
       console.debug(
         `Learning Traces Extension Settings: learningtrace is set to '${learningtrace}'`
-      );
-
-      learningpath = setting.get('learningpath').composite as string;
-      console.debug(
-        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
       );
 
       trackedtags = setting.get('trackedtags').composite as string;
@@ -166,23 +159,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       });
 
     const contents = new ContentsManager();
-    let learningContent = '';
-
-    const notebookPanel = tracker.currentWidget;
-    const event = { 'name': 'CellExecuteEvent'};
-
-    const exporter_type: Exporter = {
-      type: 'file_exporter',
-      args: {
-        path: 'log',
-        id: ''
-      }
-    }
-    
-    if (notebookPanel != null) {
-        await pioneer.publishEvent(notebookPanel, event, exporter_type , false );
-    }
-    NotebookActions.executed.connect((_, args) => {
+    NotebookActions.executed.connect(async (_, args) => {
       const { cell, success } = args;
       const path = tracker.currentWidget?.context.path;
       if (local) {
@@ -199,7 +176,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
           getData(contents, '/' + configpath + LOCAL_CONFIG_FILE)
             .then(config => {
               learningtrace = config.learningtrace || learningtrace;
-              learningpath = config.learningpath || learningpath;
               let tags: string[] = [];
               if (
                 Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
@@ -316,20 +292,23 @@ const plugin: JupyterFrontEndPlugin<void> = {
             ', "notebook" : "' +
             path +
             '" }';
-          const jsonCellOutput = JSON.parse(jsonStringOutput);
-          const filename = learningpath + '/' + learningtrace;
-          contents
-            .get(filename)
-            .then(filemodel => {
-              learningContent = filemodel.content;
-            })
-            .catch(error => {
-              console.warn(error);
-            })
-            .then(() => {
-              learningContent += JSON.stringify(jsonCellOutput) + '\n';
-              console.log(learningContent)
-            });
+          const notebookPanel = tracker.currentWidget;
+          const event = {
+            eventName: 'CellExecuteEvent',
+            eventData: jsonStringOutput
+          };
+    
+          const exporter_type: Exporter = {
+            type: 'file_exporter',
+            args: {
+              path: learningtrace,
+              id: ''
+            }
+          }
+        
+          if (notebookPanel != null) {
+            await pioneer.publishEvent(notebookPanel, event, exporter_type , false );
+          }
         }
       }
     });
