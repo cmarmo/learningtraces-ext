@@ -173,62 +173,62 @@ const plugin: JupyterFrontEndPlugin<void> = {
           for (let j = 0; j < i; j++) {
             configpath += pathComponents[j] + '/';
           }
-          getData(contents, '/' + configpath + LOCAL_CONFIG_FILE)
-            .then(config => {
-              learningtrace = config.learningtrace || learningtrace;
-              let tags: string[] = [];
-              if (
-                Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
-                config.learningtag !== ''
-              ) {
-                tags = config.learningtag.split('.');
-                if (tags.length > 1) {
-                  nestedKeys = true;
-                  learningtag = tags;
-                } else {
-                  learningtag = tags[0];
-                }
+          const url = '/' + configpath + LOCAL_CONFIG_FILE
+          try {
+            const config = await getData(contents, url);
+            learningtrace = config.learningtrace || learningtrace;
+            let tags: string[] = [];
+            if (
+              Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
+              config.learningtag !== ''
+            ) {
+              tags = config.learningtag.split('.');
+              if (tags.length > 1) {
+                nestedKeys = true;
+                learningtag = tags;
+              } else {
+                learningtag = tags[0];
               }
+            }
 
-              if (
-                Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
-                config.trackedtags !== ''
-              ) {
-                const tobeTracked = config.trackedtags.split(',');
-                for (let i = 0; i < tobeTracked.length; i++) {
-                  tags = tobeTracked[i].split('.');
-                  if (tags.length > 1) {
-                    nestedTags[nestedTags.length] = true;
-                  } else {
-                    nestedTags[nestedTags.length] = false;
-                  }
-                  trackedtags = tobeTracked;
-                }
-              }
-              if (
-                Object.prototype.hasOwnProperty.call(
-                  config,
-                  'trackedoutputs'
-                ) &&
-                config.trackedoutputs !== ''
-              ) {
-                if (config.trackedoutputs === 'all') {
-                  alloutput = true;
+            if (
+              Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
+              config.trackedtags !== ''
+            ) {
+              const tobeTracked = config.trackedtags.split(',');
+              for (let i = 0; i < tobeTracked.length; i++) {
+                tags = tobeTracked[i].split('.');
+                if (tags.length > 1) {
+                  nestedTags[nestedTags.length] = true;
                 } else {
-                  const outputs = config.trackedoutputs.split(',');
-                  for (let i = 0; i < outputs.length; i++) {
-                    outputs[i].trim();
-                  }
-                  trackedoutputs = outputs;
+                  nestedTags[nestedTags.length] = false;
                 }
+                trackedtags = tobeTracked;
               }
-              get_success = true;
-            })
-            .catch((error: any) => {
+            }
+            if (
+              Object.prototype.hasOwnProperty.call(
+                config,
+                'trackedoutputs'
+              ) &&
+              config.trackedoutputs !== ''
+            ) {
+              if (config.trackedoutputs === 'all') {
+                alloutput = true;
+              } else {
+                const outputs = config.trackedoutputs.split(',');
+                for (let i = 0; i < outputs.length; i++) {
+                  outputs[i].trim();
+                }
+                trackedoutputs = outputs;
+              }
+            }
+            get_success = true;
+          } catch(error: any) {
               console.warn(
                 `Cannot read '${'/' + configpath + LOCAL_CONFIG_FILE}' local configuration: '${error.message}'`
               );
-            });
+          };
         }
       }
       const time = new Date();
