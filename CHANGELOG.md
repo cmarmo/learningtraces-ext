@@ -1,6 +1,10 @@
 # Changelog
 
-### Version 0.5.1
+## Version 0.6
+
+- **Feature**: telemetry benefits of the pioneer infrastructure
+
+### Version 0.5.2
 
 - **Bugfix**: fix tag value read as Object
 

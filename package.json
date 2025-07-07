@@ -1,6 +1,6 @@
 {
     "name": "learning-traces-extension",
-    "version": "0.5.2",
+    "version": "0.6.0",
     "description": "A jupyter extension that save learning traces when executing a notebook.",
     "keywords": [
         "jupyter",
@@ -62,7 +62,7 @@
         "@jupyterlab/services": "^7.2.5",
         "@jupyterlab/settingregistry": "^4.2.5",
         "@jupyterlab/ui-components": "^4.2.5",
-        "@types/wicg-file-system-access": "^2023.10.5",
+        "jupyterlab-pioneer": "^1.7.0",
         "yaml": "2.7.0"
     },
     "devDependencies": {

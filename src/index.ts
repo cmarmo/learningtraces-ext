@@ -8,6 +8,9 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { NotebookActions, INotebookTracker } from '@jupyterlab/notebook';
 import { CodeCellModel } from '@jupyterlab/cells';
+import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
+import { Exporter } from 'jupyterlab-pioneer/lib/types';
+
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
 const LEARNING_TRACE_FILE =
@@ -38,22 +41,6 @@ function readRecursively(
   return tagValue;
 }
 
-async function writelt(
-  contentsManager: ContentsManager,
-  filename: string,
-  content: string
-) {
-  try {
-    contentsManager.save(filename, {
-      content: content,
-      format: 'text',
-      type: 'file'
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 /**
  * Initialization data for the jupyterlab learning traces extension.
  */
@@ -62,10 +49,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description:
     'A jupyter extension that save learning traces when executing a notebook.',
   autoStart: true,
-  requires: [ISettingRegistry, INotebookTracker],
+  requires: [ISettingRegistry, IJupyterLabPioneer, INotebookTracker],
   activate: async (
     app: JupyterFrontEnd,
     settings: ISettingRegistry,
+    pioneer: IJupyterLabPioneer,
     tracker: INotebookTracker
   ) => {
     console.log('JupyterLab extension learning-traces-extension is activated!');
@@ -73,7 +61,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
     let local: boolean = false;
     let learningtag: string | string[] = '';
     let learningtrace: string = '';
-    let learningpath: string = '';
     let nestedKeys: boolean = false;
     let trackedtags: string | string[] | string[][] = '';
     let trackedoutputs: string | string[] = '';
@@ -104,11 +91,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
       console.debug(
         `Learning Traces Extension Settings: learningtrace is set to '${learningtrace}'`
-      );
-
-      learningpath = setting.get('learningpath').composite as string;
-      console.debug(
-        `Learning Traces Extension Settings: learningpath is set to '${learningpath}'`
       );
 
       trackedtags = setting.get('trackedtags').composite as string;
@@ -173,9 +155,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       });
 
     const contents = new ContentsManager();
-    let learningContent = '';
-
-    NotebookActions.executed.connect((_, args) => {
+    NotebookActions.executed.connect(async (_, args) => {
       const { cell, success } = args;
       const path = tracker.currentWidget?.context.path;
       if (local) {
@@ -189,63 +169,59 @@ const plugin: JupyterFrontEndPlugin<void> = {
           for (let j = 0; j < i; j++) {
             configpath += pathComponents[j] + '/';
           }
-          getData(contents, '/' + configpath + LOCAL_CONFIG_FILE)
-            .then(config => {
-              learningtrace = config.learningtrace || learningtrace;
-              learningpath = config.learningpath || learningpath;
-              let tags: string[] = [];
-              if (
-                Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
-                config.learningtag !== ''
-              ) {
-                tags = config.learningtag.split('.');
-                if (tags.length > 1) {
-                  nestedKeys = true;
-                  learningtag = tags;
-                } else {
-                  learningtag = tags[0];
-                }
+          const url = '/' + configpath + LOCAL_CONFIG_FILE;
+          try {
+            const config = await getData(contents, url);
+            learningtrace = config.learningtrace || learningtrace;
+            let tags: string[] = [];
+            if (
+              Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
+              config.learningtag !== ''
+            ) {
+              tags = config.learningtag.split('.');
+              if (tags.length > 1) {
+                nestedKeys = true;
+                learningtag = tags;
+              } else {
+                learningtag = tags[0];
               }
+            }
 
-              if (
-                Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
-                config.trackedtags !== ''
-              ) {
-                const tobeTracked = config.trackedtags.split(',');
-                for (let i = 0; i < tobeTracked.length; i++) {
-                  tags = tobeTracked[i].split('.');
-                  if (tags.length > 1) {
-                    nestedTags[nestedTags.length] = true;
-                  } else {
-                    nestedTags[nestedTags.length] = false;
-                  }
-                  trackedtags = tobeTracked;
-                }
-              }
-              if (
-                Object.prototype.hasOwnProperty.call(
-                  config,
-                  'trackedoutputs'
-                ) &&
-                config.trackedoutputs !== ''
-              ) {
-                if (config.trackedoutputs === 'all') {
-                  alloutput = true;
+            if (
+              Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
+              config.trackedtags !== ''
+            ) {
+              const tobeTracked = config.trackedtags.split(',');
+              for (let i = 0; i < tobeTracked.length; i++) {
+                tags = tobeTracked[i].split('.');
+                if (tags.length > 1) {
+                  nestedTags[nestedTags.length] = true;
                 } else {
-                  const outputs = config.trackedoutputs.split(',');
-                  for (let i = 0; i < outputs.length; i++) {
-                    outputs[i].trim();
-                  }
-                  trackedoutputs = outputs;
+                  nestedTags[nestedTags.length] = false;
                 }
+                trackedtags = tobeTracked;
               }
-              get_success = true;
-            })
-            .catch((error: any) => {
-              console.warn(
-                `Cannot read '${'/' + configpath + LOCAL_CONFIG_FILE}' local configuration: '${error.message}'`
-              );
-            });
+            }
+            if (
+              Object.prototype.hasOwnProperty.call(config, 'trackedoutputs') &&
+              config.trackedoutputs !== ''
+            ) {
+              if (config.trackedoutputs === 'all') {
+                alloutput = true;
+              } else {
+                const outputs = config.trackedoutputs.split(',');
+                for (let i = 0; i < outputs.length; i++) {
+                  outputs[i].trim();
+                }
+                trackedoutputs = outputs;
+              }
+            }
+            get_success = true;
+          } catch (error: any) {
+            console.warn(
+              `Cannot read '${'/' + configpath + LOCAL_CONFIG_FILE}' local configuration: '${error.message}'`
+            );
+          }
         }
       }
       const time = new Date();
@@ -309,20 +285,28 @@ const plugin: JupyterFrontEndPlugin<void> = {
             ', "notebook" : "' +
             path +
             '" }';
-          const jsonCellOutput = JSON.parse(jsonStringOutput);
-          const filename = learningpath + '/' + learningtrace;
-          contents
-            .get(filename)
-            .then(filemodel => {
-              learningContent = filemodel.content;
-            })
-            .catch(error => {
-              console.warn(error);
-            })
-            .then(() => {
-              learningContent += JSON.stringify(jsonCellOutput) + '\n';
-              writelt(contents, filename, learningContent);
-            });
+          const notebookPanel = tracker.currentWidget;
+          const event = {
+            eventName: 'CellExecuteEvent',
+            eventData: JSON.parse(jsonStringOutput)
+          };
+
+          const exporter_type: Exporter = {
+            type: 'file_exporter',
+            args: {
+              path: learningtrace,
+              id: ''
+            }
+          };
+
+          if (notebookPanel !== null) {
+            await pioneer.publishEvent(
+              notebookPanel,
+              event,
+              exporter_type,
+              false
+            );
+          }
         }
       }
     });
