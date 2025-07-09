@@ -9,7 +9,7 @@
     ],
     "homepage": "",
     "bugs": {
-        "url": "/issues"
+        "url": "https://github.com/cmarmo/learningtraces-ext/issues"
     },
     "license": "BSD-3-Clause",
     "author": {
@@ -57,12 +57,12 @@
         "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
-        "@jupyterlab/application": "^4.2.5",
-        "@jupyterlab/notebook": "^4.2.5",
-        "@jupyterlab/services": "^7.2.5",
-        "@jupyterlab/settingregistry": "^4.2.5",
-        "@jupyterlab/ui-components": "^4.2.5",
-        "jupyterlab-pioneer": "^1.7.0",
+        "@jupyterlab/application": "^4.0.0",
+        "@jupyterlab/notebook": "^4.0.6",
+        "@jupyterlab/services": "^7.0.0",
+        "@jupyterlab/settingregistry": "^4.0.0",
+        "@jupyterlab/ui-components": "^4.0.0",
+        "jupyterlab-pioneer": "^1.7.1",
         "yaml": "2.7.0"
     },
     "devDependencies": {
@@ -103,6 +103,13 @@
     "jupyterlab": {
         "extension": true,
         "outputDir": "learning_traces_extension/labextension",
+        "sharedPackages": {
+            "jupyterlab-pioneer": {
+                "bundled": false,
+                "singleton": true,
+                "strictVersion": true
+            }
+        },
         "schemaDir": "schema"
     },
     "eslintIgnore": [

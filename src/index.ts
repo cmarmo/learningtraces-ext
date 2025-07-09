@@ -155,7 +155,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       });
 
     const contents = new ContentsManager();
-    NotebookActions.executed.connect(async (_, args) => {
+    NotebookActions.executed.connect(async (_: any, args: any) => {
       const { cell, success } = args;
       const path = tracker.currentWidget?.context.path;
       if (local) {
