@@ -12,7 +12,7 @@ A jupyter extension that save learning traces when executing a notebook.
 To install the extension, execute:
 
 ```bash
-pip install jupyter-pioneer
+pip install jupyterlab-pioneer
 pip install git+https://github.com/cmarmo/learningtraces-ext.git
 ```
 
