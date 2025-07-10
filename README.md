@@ -5,12 +5,14 @@ A jupyter extension that save learning traces when executing a notebook.
 ## Requirements
 
 - JupyterLab >= 4.0.0
+- jupyterlab-pioneer >= 1.7.1
 
 ## Install
 
 To install the extension, execute:
 
 ```bash
+pip install jupyter-pioneer
 pip install git+https://github.com/cmarmo/learningtraces-ext.git
 ```
 
