@@ -13,6 +13,7 @@ image: python
     - apt update
     - apt install -y nodejs npm
     - python -m pip install -U "jupyterlab>=4.0.0,<5"
+    - python -m pip install -U "jupyterlab-pioneer>=1.7.0"
 
 stages:
   - build
