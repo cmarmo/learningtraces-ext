@@ -157,7 +157,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const contents = new ContentsManager();
     NotebookActions.executed.connect(async (_: any, args: any) => {
       const { cell, success } = args;
-      const path = tracker.currentWidget?.context.path;
+      const notebookPanel = tracker.currentWidget;
+      const path = notebookPanel?.context.path;
       if (local) {
         const pathComponents = path?.split('/') || [];
         const repolevels = pathComponents.length;
@@ -274,28 +275,23 @@ const plugin: JupyterFrontEndPlugin<void> = {
               outputString += ']';
             }
           }
-          const jsonStringOutput =
-            '{ "time": "' +
-            timestamp +
-            '"' +
-            outputString +
-            ', "success" : ' +
-            success +
-            cellMetadata +
-            ', "notebook" : "' +
-            path +
-            '" }';
-          const notebookPanel = tracker.currentWidget;
+          const jsonOutput = {
+            time: timestamp,
+            notebookPath: path,
+            outputs: outputString,
+            success: success,
+            cellmetadata: cellMetadata
+          };
           const event = {
             eventName: 'CellExecuteEvent',
-            eventData: JSON.parse(jsonStringOutput)
+            eventData: jsonOutput
           };
 
           const exporter_type: Exporter = {
-            type: 'file_exporter',
+            type: 'custom_exporter',
             args: {
               path: learningtrace,
-              id: ''
+              id: 'JSONlExporter'
             }
           };
 
