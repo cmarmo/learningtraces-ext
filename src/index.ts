@@ -159,6 +159,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       const { cell, success } = args;
       const notebookPanel = tracker.currentWidget;
       const path = notebookPanel?.context.path;
+      let configpath = '';
       if (local) {
         const pathComponents = path?.split('/') || [];
         const repolevels = pathComponents.length;
@@ -166,14 +167,14 @@ const plugin: JupyterFrontEndPlugin<void> = {
         let get_success = false;
         while (i > 0 && !get_success) {
           i -= 1;
-          let configpath = '';
+          configpath = '';
           for (let j = 0; j < i; j++) {
             configpath += pathComponents[j] + '/';
           }
           const url = '/' + configpath + LOCAL_CONFIG_FILE;
           try {
             const config = await getData(contents, url);
-            learningtrace = config.learningtrace || learningtrace;
+            learningtrace = configpath + config.learningtrace || learningtrace;
             let tags: string[] = [];
             if (
               Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
@@ -277,7 +278,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           }
           const jsonOutput = {
             time: timestamp,
-            notebookPath: path,
+            notebookPath: path?.split(configpath)[1],
             outputs: outputString,
             success: success,
             cellmetadata: cellMetadata
