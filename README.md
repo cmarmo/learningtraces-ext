@@ -16,6 +16,14 @@ pip install jupyterlab-pioneer
 pip install git+https://github.com/cmarmo/learningtraces-ext.git
 ```
 
+The custom pioneer exporter is defined in `jupyter-config/jupyter_jupyterlab_pioneer_config.py` which should be copied in the
+relevant jupyter configuration directory.
+Configuration directories can be listed with command
+
+```bash
+jupyter --path
+```
+
 <!--pip install learning_traces_extension-->
 
 ## Uninstall
