@@ -11,6 +11,14 @@ import { CodeCellModel } from '@jupyterlab/cells';
 import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
 import { Exporter } from 'jupyterlab-pioneer/lib/types';
 
+type learnRecord = {
+  time: string;
+  notebookPath: string | undefined;
+  success: boolean;
+  outputs?: string;
+  cellmetadata?: object;
+};
+
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
 const LEARNING_TRACE_FILE =
@@ -239,21 +247,24 @@ const plugin: JupyterFrontEndPlugin<void> = {
         if (learningtag !== '' && tagValue) {
           const myCellModel = cell.model as CodeCellModel;
           let tags: string[] = [];
-          let cellMetadata = '{';
-          for (let i = 0; i < trackedtags.length; i++) {
-            const tag = (trackedtags[i] as string).trim();
-            tags = tag.split('.');
-            const trackValue = readRecursively(
-              myCellModel,
-              nestedTags[i],
-              tags
-            );
-            cellMetadata += '"' + tag + '" : "' + trackValue + '"';
-            if (i < trackedtags.length - 1) {
-              cellMetadata += ',';
+          let cellMetadata = '';
+          if (trackedtags.length > 0) {
+            cellMetadata += '{';
+            for (let i = 0; i < trackedtags.length; i++) {
+              const tag = (trackedtags[i] as string).trim();
+              tags = tag.split('.');
+              const trackValue = readRecursively(
+                myCellModel,
+                nestedTags[i],
+                tags
+              );
+              cellMetadata += '"' + tag + '" : "' + trackValue + '"';
+              if (i < trackedtags.length - 1) {
+                cellMetadata += ',';
+              }
             }
+            cellMetadata += '}';
           }
-          cellMetadata += '}';
 
           const learnedCell = myCellModel.outputs.toJSON();
           let outputString: string = '';
@@ -272,12 +283,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
               outputString += ']';
             }
           }
-          const jsonOutput = {
+          const jsonOutput: learnRecord = {
             time: timestamp,
             notebookPath: configpath === '' ? path : path?.split(configpath)[1],
-            outputs: outputString,
             success: success,
-            cellmetadata: JSON.parse(cellMetadata)
+            outputs: outputString !== '' ? outputString : undefined,
+            cellmetadata:
+              cellMetadata !== '' ? JSON.parse(cellMetadata) : undefined
           };
           const event = {
             eventName: 'CellExecuteEvent',
