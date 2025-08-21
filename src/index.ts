@@ -1,5 +1,3 @@
-import YAML from 'yaml';
-
 import { ContentsManager } from '@jupyterlab/services';
 import {
   JupyterFrontEnd,
@@ -11,43 +9,13 @@ import { CodeCellModel } from '@jupyterlab/cells';
 import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
 import { Exporter } from 'jupyterlab-pioneer/lib/types';
 
-type learnRecord = {
-  time: string;
-  notebookPath: string | undefined;
-  success: boolean;
-  outputs?: string;
-  cellmetadata?: object;
-};
+import { learnRecord, getData, readRecursively } from './types';
 
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
 const LEARNING_TRACE_FILE =
   '.learningtrace_' + d.getTime().toString() + '.jsonl';
 const LOCAL_CONFIG_FILE = 'learningtrace_config.yml';
-
-async function getData(contents: ContentsManager, url: string) {
-  const config = YAML.parse((await contents.get(url)).content);
-  return config;
-}
-
-function readRecursively(
-  cellmodel: CodeCellModel,
-  nested: boolean,
-  tags: string | string[]
-) {
-  if (typeof tags === 'string') {
-    tags = [tags];
-  }
-  let tagValue: string = cellmodel.getMetadata(tags[0]);
-  if (tagValue !== undefined) {
-    for (let i = 1; i < tags.length; i++) {
-      const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
-      tagValue = descriptor?.value;
-      console.log(tagValue);
-    }
-  }
-  return tagValue;
-}
 
 /**
  * Initialization data for the jupyterlab learning traces extension.
