@@ -3,6 +3,7 @@
 ## Version 0.6
 
 - **Feature**: telemetry benefits of the pioneer infrastructure
+- **Settings**: remove the `local` setting parameter
 
 ### Version 0.5.2
 
