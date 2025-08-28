@@ -3,7 +3,10 @@
 ## Version 0.6
 
 - **Feature**: telemetry benefits of the pioneer infrastructure
-- **Settings**: remove the `local` setting parameter
+- **Settings**:
+  - remove the `local` setting parameter
+  - add a `learningobject` parameter, setting the metadata we want to use as
+    learning object identifier in the learning trace
 
 ### Version 0.5.2
 

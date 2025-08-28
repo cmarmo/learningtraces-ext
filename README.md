@@ -43,6 +43,7 @@ and placed at any level of the notebook directory tree.
 
 - _learningtag_ : the tag used in cell metadata to identify learning cells
   which output should be recorded, 'null' by default, nothing is recorded;
+- _learningObjectId_ : The metadata used to identify the learning object in the learning trace.
 - _learningtrace_ : the name of the file containing the learning traces;
 - _trackedtags_ : the list of additional informations stored in the learning trace;
 - _trackedoutputs_ : the list of output types stored in the learning trace;

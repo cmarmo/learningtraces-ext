@@ -9,7 +9,7 @@ import { CodeCellModel } from '@jupyterlab/cells';
 import { IJupyterLabPioneer } from 'jupyterlab-pioneer';
 import { Exporter } from 'jupyterlab-pioneer/lib/types';
 
-import { learnRecord, getData, readRecursively } from './types';
+import { learnRecord, getData, readRecursively, learnObject } from './types';
 
 const PLUGIN_ID = 'learning-traces-extension:plugin';
 const d = new Date();
@@ -35,6 +35,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
     let learningtag: string | string[] = '';
+    let learningObjectId: string | string[] = '';
     let learningtrace: string = '';
     let nestedKeys: boolean = false;
     let trackedtags: string | string[] | string[][] = '';
@@ -53,6 +54,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
       learningtag = setting.get('learningtag').composite as string;
       console.debug(
         `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
+      );
+
+      learningObjectId = setting.get('learningObjectId').composite as string;
+      console.debug(
+        `Learning Traces Extension Settings: learningObjectId is set to '${learningObjectId}'`
       );
 
       learningtrace = setting.get('learningtrace').composite as string;
@@ -81,6 +87,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
           learningtag = tags;
         } else {
           learningtag = tags[0];
+        }
+      }
+
+      let ltags: string[] = [];
+      if (learningObjectId !== undefined) {
+        ltags = learningObjectId.split('.');
+        if (ltags.length > 1) {
+          nestedKeys = true;
+          learningObjectId = ltags;
+        } else {
+          learningObjectId = ltags[0];
         }
       }
 
@@ -158,6 +175,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
             }
           }
 
+          let ltags: string[] = [];
+          if (
+            Object.prototype.hasOwnProperty.call(config, 'learningobject') &&
+            config.learningobject !== ''
+          ) {
+            ltags = config.learningobject.split('.');
+            if (ltags.length > 1) {
+              nestedKeys = true;
+              learningObjectId = ltags;
+            } else {
+              learningObjectId = ltags[0];
+            }
+          }
+
           if (
             Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
             config.trackedtags !== ''
@@ -206,12 +237,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
         ('0' + time.getMinutes().toString()).slice(-2) +
         ('0' + time.getSeconds().toString()).slice(-2);
       let tagValue = '';
+      let objectTag = '';
       if (cell.model.type === 'code') {
         tagValue = readRecursively(
           cell.model as CodeCellModel,
           nestedKeys,
           learningtag
         );
+        if (learningObjectId !== undefined) {
+          objectTag = readRecursively(
+            cell.model as CodeCellModel,
+            nestedKeys,
+            learningObjectId
+          );
+        }
         if (learningtag !== '' && tagValue) {
           const myCellModel = cell.model as CodeCellModel;
           let tags: string[] = [];
@@ -251,14 +290,27 @@ const plugin: JupyterFrontEndPlugin<void> = {
               outputString += ']';
             }
           }
+
+          const notebookPath =
+            configpath === '' ? path : path?.split(configpath)[1];
           const jsonOutput: learnRecord = {
             time: timestamp,
-            notebookPath: configpath === '' ? path : path?.split(configpath)[1],
+            notebook: notebookPath,
             success: success,
+            action: 'execute',
             outputs: outputString !== '' ? outputString : undefined,
             cellmetadata:
               cellMetadata !== '' ? JSON.parse(cellMetadata) : undefined
           };
+
+          if (objectTag !== '') {
+            const learningObject: learnObject = {
+              fileID: notebookPath,
+              cellID: objectTag
+            };
+            jsonOutput.learning_object = `${learningObject.fileID}#${learningObject.cellID}`;
+          }
+
           const event = {
             eventName: 'CellExecuteEvent',
             eventData: jsonOutput
