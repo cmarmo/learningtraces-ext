@@ -10,6 +10,12 @@
       "description": "The tag used in cell metadata to identify learning cells.",
       "default": ""
     },
+    "learningObjectId": {
+      "type": "string",
+      "title": "learningObjectId",
+      "description": "The format of the learning object identification, composed by notebook metadata.",
+      "default": ""
+    },
     "learningtrace": {
       "type": "string",
       "title": "learningtrace",

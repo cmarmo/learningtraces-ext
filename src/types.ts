@@ -4,10 +4,17 @@ import { ContentsManager } from '@jupyterlab/services';
 
 export type learnRecord = {
   time: string;
-  notebookPath: string | undefined;
+  notebook: string | undefined;
   success: boolean;
+  action: string;
+  learning_object?: string | undefined;
   outputs?: string;
   cellmetadata?: object;
+};
+
+export type learnObject = {
+  fileID: string | undefined;
+  cellID: string | undefined;
 };
 
 export async function getData(contents: ContentsManager, url: string) {
@@ -28,7 +35,6 @@ export function readRecursively(
     for (let i = 1; i < tags.length; i++) {
       const descriptor = Object.getOwnPropertyDescriptor(tagValue, tags[i]);
       tagValue = descriptor?.value;
-      console.log(tagValue);
     }
   }
   return tagValue;
