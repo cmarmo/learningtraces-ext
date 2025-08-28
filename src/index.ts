@@ -34,12 +34,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     console.log('JupyterLab extension learning-traces-extension is activated!');
 
-    let learningtag: string | string[] = '';
+    let recordCellFlag: string | string[] = '';
     let learningObjectId: string | string[] = '';
-    let learningtrace: string = '';
+    let learningTrace: string = '';
     let nestedKeys: boolean = false;
-    let trackedtags: string | string[] | string[][] = '';
-    let trackedoutputs: string | string[] = '';
+    let trackedTags: string | string[] | string[][] = '';
+    let trackedOutputs: string | string[] = '';
     let alloutput: boolean = false;
     const nestedTags: boolean[] = [];
 
@@ -51,9 +51,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
     function loadSetting(setting: ISettingRegistry.ISettings): void {
       // Read the settings and convert to the correct type
 
-      learningtag = setting.get('learningtag').composite as string;
+      recordCellFlag = setting.get('recordCellFlag').composite as string;
       console.debug(
-        `Learning Traces Extension Settings: learningtag is set to '${learningtag}'`
+        `Learning Traces Extension Settings: recordCellFlag is set to '${recordCellFlag}'`
       );
 
       learningObjectId = setting.get('learningObjectId').composite as string;
@@ -61,32 +61,32 @@ const plugin: JupyterFrontEndPlugin<void> = {
         `Learning Traces Extension Settings: learningObjectId is set to '${learningObjectId}'`
       );
 
-      learningtrace = setting.get('learningtrace').composite as string;
-      if (learningtrace === '') {
-        learningtrace = LEARNING_TRACE_FILE;
+      learningTrace = setting.get('learningTrace').composite as string;
+      if (learningTrace === '') {
+        learningTrace = LEARNING_TRACE_FILE;
       }
       console.debug(
-        `Learning Traces Extension Settings: learningtrace is set to '${learningtrace}'`
+        `Learning Traces Extension Settings: learningTrace is set to '${learningTrace}'`
       );
 
-      trackedtags = setting.get('trackedtags').composite as string;
+      trackedTags = setting.get('trackedTags').composite as string;
       console.debug(
-        `Learning Traces Extension Settings: trackedtags is set to '${trackedtags}'`
+        `Learning Traces Extension Settings: trackedTags is set to '${trackedTags}'`
       );
 
-      trackedoutputs = setting.get('trackedoutputs').composite as string;
+      trackedOutputs = setting.get('trackedOutputs').composite as string;
       console.debug(
-        `Learning Traces Extension Settings: trackedoutputs is set to '${trackedoutputs}'`
+        `Learning Traces Extension Settings: trackedOutputs is set to '${trackedOutputs}'`
       );
 
       let tags: string[] = [];
-      if (learningtag !== '') {
-        tags = learningtag.split('.');
+      if (recordCellFlag !== '') {
+        tags = recordCellFlag.split('.');
         if (tags.length > 1) {
           nestedKeys = true;
-          learningtag = tags;
+          recordCellFlag = tags;
         } else {
-          learningtag = tags[0];
+          recordCellFlag = tags[0];
         }
       }
 
@@ -101,11 +101,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
       }
 
-      if (trackedtags !== '') {
-        const tobeTracked = trackedtags.split(',');
-        trackedtags = tobeTracked;
-        for (let i = 0; i < trackedtags.length; i++) {
-          tags = trackedtags[i].split('.');
+      if (trackedTags !== '') {
+        const tobeTracked = trackedTags.split(',');
+        trackedTags = tobeTracked;
+        for (let i = 0; i < trackedTags.length; i++) {
+          tags = trackedTags[i].split('.');
           if (tags.length > 1) {
             nestedTags[nestedTags.length] = true;
           } else {
@@ -114,14 +114,14 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
       }
 
-      if (trackedoutputs === 'all') {
+      if (trackedOutputs === 'all') {
         alloutput = true;
       } else {
-        const outputs = trackedoutputs.split(',');
+        const outputs = trackedOutputs.split(',');
         for (let i = 0; i < outputs.length; i++) {
           outputs[i].trim();
         }
-        trackedoutputs = outputs;
+        trackedOutputs = outputs;
       }
     }
 
@@ -160,27 +160,27 @@ const plugin: JupyterFrontEndPlugin<void> = {
         const url = '/' + configpath + LOCAL_CONFIG_FILE;
         try {
           const config = await getData(contents, url);
-          learningtrace = configpath + config.learningtrace || learningtrace;
+          learningTrace = configpath + config.learningTrace || learningTrace;
           let tags: string[] = [];
           if (
-            Object.prototype.hasOwnProperty.call(config, 'learningtag') &&
-            config.learningtag !== ''
+            Object.prototype.hasOwnProperty.call(config, 'recordCellFlag') &&
+            config.recordCellFlag !== ''
           ) {
-            tags = config.learningtag.split('.');
+            tags = config.recordCellFlag.split('.');
             if (tags.length > 1) {
               nestedKeys = true;
-              learningtag = tags;
+              recordCellFlag = tags;
             } else {
-              learningtag = tags[0];
+              recordCellFlag = tags[0];
             }
           }
 
           let ltags: string[] = [];
           if (
-            Object.prototype.hasOwnProperty.call(config, 'learningobject') &&
-            config.learningobject !== ''
+            Object.prototype.hasOwnProperty.call(config, 'learningObjectId') &&
+            config.learningObjectId !== ''
           ) {
-            ltags = config.learningobject.split('.');
+            ltags = config.learningObjectId.split('.');
             if (ltags.length > 1) {
               nestedKeys = true;
               learningObjectId = ltags;
@@ -190,10 +190,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
           }
 
           if (
-            Object.prototype.hasOwnProperty.call(config, 'trackedtags') &&
-            config.trackedtags !== ''
+            Object.prototype.hasOwnProperty.call(config, 'trackedTags') &&
+            config.trackedTags !== ''
           ) {
-            const tobeTracked = config.trackedtags.split(',');
+            const tobeTracked = config.trackedTags.split(',');
             for (let i = 0; i < tobeTracked.length; i++) {
               tags = tobeTracked[i].split('.');
               if (tags.length > 1) {
@@ -201,21 +201,21 @@ const plugin: JupyterFrontEndPlugin<void> = {
               } else {
                 nestedTags[nestedTags.length] = false;
               }
-              trackedtags = tobeTracked;
+              trackedTags = tobeTracked;
             }
           }
           if (
-            Object.prototype.hasOwnProperty.call(config, 'trackedoutputs') &&
-            config.trackedoutputs !== ''
+            Object.prototype.hasOwnProperty.call(config, 'trackedOutputs') &&
+            config.trackedOutputs !== ''
           ) {
-            if (config.trackedoutputs === 'all') {
+            if (config.trackedOutputs === 'all') {
               alloutput = true;
             } else {
-              const outputs = config.trackedoutputs.split(',');
+              const outputs = config.trackedOutputs.split(',');
               for (let i = 0; i < outputs.length; i++) {
                 outputs[i].trim();
               }
-              trackedoutputs = outputs;
+              trackedOutputs = outputs;
             }
           }
           get_success = true;
@@ -242,7 +242,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         tagValue = readRecursively(
           cell.model as CodeCellModel,
           nestedKeys,
-          learningtag
+          recordCellFlag
         );
         if (learningObjectId !== undefined) {
           objectTag = readRecursively(
@@ -251,14 +251,14 @@ const plugin: JupyterFrontEndPlugin<void> = {
             learningObjectId
           );
         }
-        if (learningtag !== '' && tagValue) {
+        if (recordCellFlag !== '' && tagValue) {
           const myCellModel = cell.model as CodeCellModel;
           let tags: string[] = [];
           let cellMetadata = '';
-          if (trackedtags.length > 0) {
+          if (trackedTags.length > 0) {
             cellMetadata += '{';
-            for (let i = 0; i < trackedtags.length; i++) {
-              const tag = (trackedtags[i] as string).trim();
+            for (let i = 0; i < trackedTags.length; i++) {
+              const tag = (trackedTags[i] as string).trim();
               tags = tag.split('.');
               const trackValue = readRecursively(
                 myCellModel,
@@ -266,7 +266,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
                 tags
               );
               cellMetadata += '"' + tag + '" : "' + trackValue + '"';
-              if (i < trackedtags.length - 1) {
+              if (i < trackedTags.length - 1) {
                 cellMetadata += ',';
               }
             }
@@ -278,10 +278,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
           if (alloutput) {
             outputString = ', "outputs" : ' + JSON.stringify(learnedCell);
           } else {
-            if (trackedoutputs[0] !== 'none') {
+            if (trackedOutputs[0] !== 'none') {
               outputString = ', "outputs" : [';
               for (const output of learnedCell) {
-                for (const outputType of trackedoutputs) {
+                for (const outputType of trackedOutputs) {
                   if (output.output_type === outputType) {
                     outputString += JSON.stringify(output);
                   }
@@ -319,7 +319,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           const exporter_type: Exporter = {
             type: 'custom_exporter',
             args: {
-              path: learningtrace,
+              path: learningTrace,
               id: 'JSONlExporter'
             }
           };
