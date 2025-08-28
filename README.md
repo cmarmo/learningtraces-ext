@@ -41,12 +41,12 @@ They can be programmatically set using `default_setting_overrides.json`,
 or in local configuration files which should be called `learningtrace_config.yml`
 and placed at any level of the notebook directory tree.
 
-- _learningtag_ : the tag used in cell metadata to identify learning cells
+- _recordCellFlag_ : the flag used in cell metadata to identify learning cells
   which output should be recorded, 'null' by default, nothing is recorded;
 - _learningObjectId_ : The metadata used to identify the learning object in the learning trace.
-- _learningtrace_ : the name of the file containing the learning traces;
-- _trackedtags_ : the list of additional informations stored in the learning trace;
-- _trackedoutputs_ : the list of output types stored in the learning trace;
+- _learningTrace_ : the name of the file containing the learning traces;
+- _trackedTags_ : the list of additional informations stored in the learning trace;
+- _trackedOutputs_ : the list of output types stored in the learning trace;
   'all' means all output types are stored, 'none' means no output is recorded,
   otherwise a list of types specified in the [notebook model](https://nbformat.readthedocs.io/en/latest/format_description.html#code-cell-outputs) should be specified.
 

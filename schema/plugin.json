@@ -4,9 +4,9 @@
   "description": "learning-traces-extension settings.",
   "type": "object",
   "properties": {
-    "learningtag": {
+    "recordCellFlag": {
       "type": "string",
-      "title": "learningtag",
+      "title": "recordCellFlag",
       "description": "The tag used in cell metadata to identify learning cells.",
       "default": ""
     },
@@ -16,19 +16,19 @@
       "description": "The format of the learning object identification, composed by notebook metadata.",
       "default": ""
     },
-    "learningtrace": {
+    "learningTrace": {
       "type": "string",
-      "title": "learningtrace",
+      "title": "learningTrace",
       "description": "The name of the file containing the learning traces.",
       "default": ""
     },
-    "trackedtags": {
+    "trackedTags": {
       "type": "string",
-      "title": "trackedtags",
+      "title": "trackedTags",
       "description": "The list of additional informations stored in the learning trace.",
       "default": ""
     },
-    "trackedoutputs": {
+    "trackedOutputs": {
       "type": "string",
       "title": "trackedoutputs",
       "description": "The list of output types stored in the learning trace.",

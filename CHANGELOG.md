@@ -5,8 +5,10 @@
 - **Feature**: telemetry benefits of the pioneer infrastructure
 - **Settings**:
   - remove the `local` setting parameter
-  - add a `learningobject` parameter, setting the metadata we want to use as
+  - add a `learningObjectId` parameter, setting the metadata we want to use as
     learning object identifier in the learning trace
+  - Rename `learningtag` to `recordCellFlag`
+  - Use camel case for setting parameters
 
 ### Version 0.5.2
 
