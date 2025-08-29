@@ -30,7 +30,7 @@
     },
     "trackedOutputs": {
       "type": "string",
-      "title": "trackedoutputs",
+      "title": "trackedOutputs",
       "description": "The list of output types stored in the learning trace.",
       "default": "none"
     }
