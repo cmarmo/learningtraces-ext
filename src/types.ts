@@ -7,7 +7,7 @@ export type learnRecord = {
   notebook: string | undefined;
   success: boolean;
   action: string;
-  learning_object?: string | undefined;
+  learning_objectID?: string | undefined;
   outputs?: string;
   cellmetadata?: object;
 };

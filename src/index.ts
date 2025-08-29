@@ -308,7 +308,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
               fileID: notebookPath,
               cellID: objectTag
             };
-            jsonOutput.learning_object = `${learningObject.fileID}#${learningObject.cellID}`;
+            jsonOutput.learning_objectID = `${learningObject.fileID}#${learningObject.cellID}`;
           }
 
           const event = {
